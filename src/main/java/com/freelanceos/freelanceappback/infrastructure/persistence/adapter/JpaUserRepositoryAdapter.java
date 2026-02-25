@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class InMemoryUserRepository implements UserRepository {
+public class JpaUserRepositoryAdapter implements UserRepository {
     private final SpringDataUserJpaRepository userJpaRepository;
 
-    public InMemoryUserRepository(SpringDataUserJpaRepository userJpaRepository) {
+    public JpaUserRepositoryAdapter(SpringDataUserJpaRepository userJpaRepository) {
         this.userJpaRepository = userJpaRepository;
     }
 
