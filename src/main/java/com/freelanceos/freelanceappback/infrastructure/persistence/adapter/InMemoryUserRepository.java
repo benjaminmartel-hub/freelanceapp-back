@@ -1,62 +1,52 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.adapter;
 
-import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
+import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
+import com.freelanceos.freelanceappback.infrastructure.persistence.repository.SpringDataUserJpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
-    private final List<UserEntity> users = new ArrayList<>();
-    private final AtomicLong idSequence = new AtomicLong(0);
+    private final SpringDataUserJpaRepository userJpaRepository;
 
-    public InMemoryUserRepository() {
-        users.add(new UserEntity(idSequence.incrementAndGet(), "Alice Martin", "alice@example.com"));
-        users.add(new UserEntity(idSequence.incrementAndGet(), "Bob Dupont", "bob@example.com"));
+    public InMemoryUserRepository(SpringDataUserJpaRepository userJpaRepository) {
+        this.userJpaRepository = userJpaRepository;
     }
 
     @Override
     public List<UserEntity> findAll() {
-        return new ArrayList<>(users);
+        return userJpaRepository.findAll();
     }
 
     @Override
     public Optional<UserEntity> findById(Long id) {
-        return users.stream()
-                .filter(user -> user.getId().equals(id))
-                .findFirst();
+        return userJpaRepository.findById(id);
     }
 
     @Override
     public UserEntity save(UserEntity user) {
-        UserEntity userToSave = new UserEntity(
-                idSequence.incrementAndGet(),
-                user.getName(),
-                user.getEmail()
-        );
-        users.add(userToSave);
-        return userToSave;
+        user.setId(null);
+        return userJpaRepository.save(user);
     }
 
     @Override
     public Optional<UserEntity> update(Long id, UserEntity user) {
-        for (int i = 0; i < users.size(); i++) {
-            UserEntity existingUser = users.get(i);
-            if (existingUser.getId().equals(id)) {
-                UserEntity updatedUser = new UserEntity(id, user.getName(), user.getEmail());
-                users.set(i, updatedUser);
-                return Optional.of(updatedUser);
-            }
+        if (!userJpaRepository.existsById(id)) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        user.setId(id);
+        return Optional.of(userJpaRepository.save(user));
     }
 
     @Override
     public boolean deleteById(Long id) {
-        return users.removeIf(user -> user.getId().equals(id));
+        if (!userJpaRepository.existsById(id)) {
+            return false;
+        }
+        userJpaRepository.deleteById(id);
+        return true;
     }
 }
