@@ -1,14 +1,14 @@
-package com.freelanceos.freelanceappback.api.model;
+package com.freelanceos.freelanceappback.infrastructure.persistence.entity;
 
-public class User {
+public class UserEntity {
     private Long id;
     private String name;
     private String email;
 
-    public User() {
+    public UserEntity() {
     }
 
-    public User(Long id, String name, String email) {
+    public UserEntity(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
