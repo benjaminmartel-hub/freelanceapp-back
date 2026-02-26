@@ -9,22 +9,6 @@ Le projet suit les principes de la **Clean Architecture** (Ports & Adaptateurs) 
 ```text
 src/main/java/com/example/myapp
 │
-├── 📂 domain                           # --- LE CŒUR MÉTIER ---
-│   ├── 📂 model                        # Objets métier (POJO purs, sans framework)
-│   │   └── User.java
-│   │
-│   ├── 📂 ports                        # Les contrats (Interfaces)
-│   │   ├── 📂 in                       # Ports d'entrée (Actions utilisateur)
-│   │   │   ├── CreateUserUseCase.java
-│   │   │   └── UpdateUserUseCase.java
-│   │   │
-│   │   └── 📂 out                      # Ports de sortie (Besoins techniques)
-│   │       └── UserRepository.java
-│   │
-│   └── 📂 service                      # Implémentations des UseCases (Interactors)
-│       ├── CreateUserService.java      # Logique de création
-│       └── UpdateUserService.java      # Logique de mise à jour
-│
 ├── 📂 application                      # --- ADAPTATEURS D'ENTRÉE ---
 │   └── 📂 rest                         # Exposition API REST
 │       ├── 📂 dto                      # Data Transfer Objects (Request/Response)
@@ -32,12 +16,30 @@ src/main/java/com/example/myapp
 │       │   └── UserResponse.java
 │       └── UserController.java         # Point d'entrée de l'API
 │
+├── 📂 domain                           # --- LE CŒUR MÉTIER ---
+│   ├── 📂 model                        # Objets métier (POJO purs, sans framework)
+│   │   └── User.java
+│   │
+│   ├── 📂 ports                        # Les contrats (Interfaces)
+│   │   ├── 📂 in                       # Ports d'entrée (Actions utilisateur)
+│   │   │   ├── CreateUserUseCase.java
+│   │   │   ├── UpdateUserUseCase.java
+│   │   │   └── ...
+│   │   │
+│   │   └── 📂 out                      # Ports de sortie (Besoins techniques)
+│   │       └── UserRepository.java
+│   │
+│   └── 📂 service                      # Implémentations des UseCases (Interactors)
+│       ├── CreateUserService.java      # Logique de création
+│       ├── UpdateUserService.java      # Logique de mise à jour
+│       └── ...
+│
 └── 📂 infrastructure                   # --- ADAPTATEURS DE SORTIE ---
     └── 📂 persistence                  # Couche de persistance des données
         ├── 📂 entity                   # Modèles de données (JPA, MongoDB, etc.)
         │   └── UserEntity.java
         └── 📂 adapter                  # Implémentations concrètes des ports out
-            └── InMemoryUserRepository.java
+            └── BDDUserRepository.java
 
 ```
 
