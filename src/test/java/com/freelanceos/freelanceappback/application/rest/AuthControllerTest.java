@@ -1,7 +1,6 @@
-package com.freelanceos.freelanceappback.application.rest.auth;
+package com.freelanceos.freelanceappback.application.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.freelanceos.freelanceappback.application.rest.AuthController;
 import com.freelanceos.freelanceappback.application.rest.dto.AuthResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.LoginRequest;
 import com.freelanceos.freelanceappback.application.rest.dto.RegisterRequest;
