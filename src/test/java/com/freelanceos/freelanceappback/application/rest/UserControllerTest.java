@@ -9,6 +9,7 @@ import com.freelanceos.freelanceappback.domain.ports.in.user.DeleteUserUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.GetAllUsersUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.GetUserByIdUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.UpdateUserUseCase;
+import com.freelanceos.freelanceappback.infrastructure.security.JwtTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -16,6 +17,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,7 +67,11 @@ class UserControllerTest {
     @MockitoBean
     private DeleteUserUseCase deleteUserUseCase;
 
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
+
     @Test
+    @WithMockUser
     void getUsersShouldReturnList() throws Exception {
         when(getAllUsersUseCase.execute()).thenReturn(List.of(
                 new User(1L, "Alice", "alice@example.com"),
@@ -80,6 +87,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getUserByIdShouldReturnUserWhenFound() throws Exception {
         when(getUserByIdUseCase.execute(1L)).thenReturn(Optional.of(new User(1L, "Alice", "alice@example.com")));
 
@@ -90,6 +98,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getUserByIdShouldReturn404WhenMissing() throws Exception {
         when(getUserByIdUseCase.execute(404L)).thenReturn(Optional.empty());
 
@@ -98,11 +107,13 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createUserShouldReturnCreatedUser() throws Exception {
         when(createUserUseCase.execute(any(User.class))).thenReturn(new User(3L, "Carol", "carol@example.com"));
         String body = objectMapper.writeValueAsString(new UserRequest("Carol", "carol@example.com"));
 
         mockMvc.perform(post("/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated())
@@ -111,12 +122,14 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void updateUserShouldReturnUpdatedUser() throws Exception {
         when(updateUserUseCase.execute(eq(1L), any(User.class)))
                 .thenReturn(Optional.of(new User(1L, "Alice Updated", "alice.updated@example.com")));
         String body = objectMapper.writeValueAsString(new UserRequest("Alice Updated", "alice.updated@example.com"));
 
         mockMvc.perform(put("/users/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
@@ -125,18 +138,20 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteUserShouldReturn204WhenDeleted() throws Exception {
         when(deleteUserUseCase.execute(1L)).thenReturn(true);
 
-        mockMvc.perform(delete("/users/1"))
+        mockMvc.perform(delete("/users/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
+    @WithMockUser
     void deleteUserShouldReturn404WhenMissing() throws Exception {
         when(deleteUserUseCase.execute(404L)).thenReturn(false);
 
-        mockMvc.perform(delete("/users/404"))
+        mockMvc.perform(delete("/users/404").with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }

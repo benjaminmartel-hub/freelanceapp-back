@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+.env
+.env.*
+!.env.example
+
+# Spring local/prod profile configs (can contain secrets)
+src/main/resources/application-*.yaml
+src/main/resources/application-*.yml
+!src/main/resources/application.yaml
+!src/main/resources/application.yml
