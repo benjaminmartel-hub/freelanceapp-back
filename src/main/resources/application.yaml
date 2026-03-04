@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: freelanceapp-back
+logging:
+  level:
+    org.springframework.security: INFO
+    com.freelanceos.freelanceappback: INFO
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-this-secret-key-for-jwt-signing-32-bytes-min}
+      expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
+    oauth2:
+      success-redirect-uri: ${OAUTH2_SUCCESS_REDIRECT_URI:http://localhost:4200/auth/login}
