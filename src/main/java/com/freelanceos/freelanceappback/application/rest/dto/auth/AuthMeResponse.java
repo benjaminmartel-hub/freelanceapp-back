@@ -1,4 +1,4 @@
-package com.freelanceos.freelanceappback.application.rest.dto;
+package com.freelanceos.freelanceappback.application.rest.dto.auth;
 
 public class AuthMeResponse {
     private String username;

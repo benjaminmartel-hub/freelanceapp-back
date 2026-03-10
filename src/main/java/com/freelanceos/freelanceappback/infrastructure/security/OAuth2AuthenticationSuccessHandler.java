@@ -1,7 +1,7 @@
 package com.freelanceos.freelanceappback.infrastructure.security;
 
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithOAuthUseCase;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,8 +53,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String preferredUsername = resolvePreferredUsername(attributes, principal.getName());
 
         AuthAccount result = loginWithOAuthUseCase.execute(provider, providerUserId, preferredUsername);
-        LOGGER.info("OAuth login succeeded for provider={} username={}", provider, result.getUsername());
-        String token = jwtTokenService.generateToken(result.getUsername(), result.getProvider().name());
+        LOGGER.info("OAuth login succeeded for provider={} username={}", provider, result.username());
+        String token = jwtTokenService.generateToken(result.username(), result.provider().name());
         String redirectUrl = UriComponentsBuilder.fromUriString(oauth2SuccessRedirectUri)
                 .queryParam("token", token)
                 .build()

@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.repository;
 
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

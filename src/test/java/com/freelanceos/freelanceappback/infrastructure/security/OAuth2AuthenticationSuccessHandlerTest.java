@@ -1,7 +1,7 @@
 package com.freelanceos.freelanceappback.infrastructure.security;
 
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithOAuthUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

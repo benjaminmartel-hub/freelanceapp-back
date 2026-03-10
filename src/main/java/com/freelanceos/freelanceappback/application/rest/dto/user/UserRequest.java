@@ -1,25 +1,15 @@
-package com.freelanceos.freelanceappback.domain.model;
+package com.freelanceos.freelanceappback.application.rest.dto.user;
 
-public class User {
-    private Long id;
+public class UserRequest {
     private String name;
     private String email;
 
-    public User() {
+    public UserRequest() {
     }
 
-    public User(Long id, String name, String email) {
-        this.id = id;
+    public UserRequest(String name, String email) {
         this.name = name;
         this.email = email;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
