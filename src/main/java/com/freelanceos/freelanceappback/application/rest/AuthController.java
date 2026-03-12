@@ -1,11 +1,11 @@
 package com.freelanceos.freelanceappback.application.rest;
 
-import com.freelanceos.freelanceappback.application.rest.dto.AuthResponse;
-import com.freelanceos.freelanceappback.application.rest.dto.AuthMeResponse;
-import com.freelanceos.freelanceappback.application.rest.dto.LoginRequest;
-import com.freelanceos.freelanceappback.application.rest.dto.RegisterRequest;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.AuthResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.AuthMeResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.LoginRequest;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.RegisterRequest;
 import com.freelanceos.freelanceappback.application.rest.mapper.AuthMapperRest;
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.GetCurrentAuthenticatedUserUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithPasswordUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.RegisterWithPasswordUseCase;
@@ -56,8 +56,8 @@ public class AuthController {
                     registerRequest.getUsername(),
                     registerRequest.getPassword()
             );
-            LOGGER.info("User registered with username={}", result.getUsername());
-            String token = jwtTokenService.generateToken(result.getUsername(), result.getProvider().name());
+            LOGGER.info("User registered with username={}", result.username());
+            String token = jwtTokenService.generateToken(result.username(), result.provider().name());
             return authMapperRest.toResponse(token);
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
@@ -71,8 +71,8 @@ public class AuthController {
                     loginRequest.getUsername(),
                     loginRequest.getPassword()
             );
-            LOGGER.info("User logged in with username={}", result.getUsername());
-            String token = jwtTokenService.generateToken(result.getUsername(), result.getProvider().name());
+            LOGGER.info("User logged in with username={}", result.username());
+            String token = jwtTokenService.generateToken(result.username(), result.provider().name());
             return authMapperRest.toResponse(token);
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
@@ -95,7 +95,7 @@ public class AuthController {
 
         try {
             AuthAccount result = getCurrentAuthenticatedUserUseCase.execute(username);
-            return new AuthMeResponse(result.getUsername(), result.getProvider().name());
+            return new AuthMeResponse(result.username(), result.provider().name());
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         }

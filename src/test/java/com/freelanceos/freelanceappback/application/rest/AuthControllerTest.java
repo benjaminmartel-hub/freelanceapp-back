@@ -1,12 +1,12 @@
 package com.freelanceos.freelanceappback.application.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.freelanceos.freelanceappback.application.rest.dto.AuthResponse;
-import com.freelanceos.freelanceappback.application.rest.dto.LoginRequest;
-import com.freelanceos.freelanceappback.application.rest.dto.RegisterRequest;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.AuthResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.LoginRequest;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.RegisterRequest;
 import com.freelanceos.freelanceappback.application.rest.mapper.AuthMapperRest;
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.GetCurrentAuthenticatedUserUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithPasswordUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.RegisterWithPasswordUseCase;

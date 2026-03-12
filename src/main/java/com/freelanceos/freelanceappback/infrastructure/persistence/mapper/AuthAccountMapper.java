@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.mapper;
 
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +18,11 @@ public class AuthAccountMapper {
 
     public AuthAccountEntity toEntity(AuthAccount account) {
         return new AuthAccountEntity(
-                account.getId(),
-                account.getUsername(),
-                account.getPasswordHash(),
-                account.getProvider(),
-                account.getProviderUserId()
+                account.id(),
+                account.username(),
+                account.passwordHash(),
+                account.provider(),
+                account.providerUserId()
         );
     }
 }

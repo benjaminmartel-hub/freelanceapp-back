@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.security;
 
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import org.springframework.security.core.userdetails.User;

@@ -1,8 +1,8 @@
 package com.freelanceos.freelanceappback.application.rest.mapper;
 
-import com.freelanceos.freelanceappback.application.rest.dto.UserRequest;
-import com.freelanceos.freelanceappback.application.rest.dto.UserResponse;
-import com.freelanceos.freelanceappback.domain.model.User;
+import com.freelanceos.freelanceappback.application.rest.dto.user.UserRequest;
+import com.freelanceos.freelanceappback.application.rest.dto.user.UserResponse;
+import com.freelanceos.freelanceappback.domain.model.user.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +16,6 @@ public class UserMapperRest {
     }
 
     public UserResponse toResponse(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponse(user.id(), user.name(), user.email());
     }
 }

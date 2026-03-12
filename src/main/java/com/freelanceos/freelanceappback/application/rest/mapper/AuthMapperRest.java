@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.application.rest.mapper;
 
-import com.freelanceos.freelanceappback.application.rest.dto.AuthResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.auth.AuthResponse;
 import org.springframework.stereotype.Component;
 
 @Component

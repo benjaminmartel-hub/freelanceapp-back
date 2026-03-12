@@ -10,6 +10,10 @@ public interface UserRepository {
 
     Optional<UserEntity> findById(Long id);
 
+    Optional<UserEntity> findByEmailIgnoreCase(String email);
+
+    Optional<UserEntity> findByNameIgnoreCase(String name);
+
     UserEntity save(UserEntity user);
 
     Optional<UserEntity> update(Long id, UserEntity user);

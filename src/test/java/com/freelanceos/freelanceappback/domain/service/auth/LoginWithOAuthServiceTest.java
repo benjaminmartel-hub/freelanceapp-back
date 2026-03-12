@@ -1,7 +1,7 @@
 package com.freelanceos.freelanceappback.domain.service.auth;
 
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.AuthAccountMapper;
@@ -38,8 +38,8 @@ class LoginWithOAuthServiceTest {
 
         AuthAccount result = loginWithOAuthService.execute(AuthProvider.GOOGLE, "oauth-id", "alice@example.com");
 
-        assertThat(result.getUsername()).isEqualTo("alice@example.com");
-        assertThat(result.getProvider()).isEqualTo(AuthProvider.GOOGLE);
+        assertThat(result.username()).isEqualTo("alice@example.com");
+        assertThat(result.provider()).isEqualTo(AuthProvider.GOOGLE);
     }
 
     @Test
@@ -56,7 +56,7 @@ class LoginWithOAuthServiceTest {
 
         AuthAccount result = loginWithOAuthService.execute(AuthProvider.GITHUB, "gh-123", "octocat");
 
-        assertThat(result.getUsername()).isEqualTo("octocat");
-        assertThat(result.getProvider()).isEqualTo(AuthProvider.GITHUB);
+        assertThat(result.username()).isEqualTo("octocat");
+        assertThat(result.provider()).isEqualTo(AuthProvider.GITHUB);
     }
 }
