@@ -50,3 +50,11 @@ src/main/java/com/example/myapp
 * **Domain** : Contient la logique métier pure. Cette couche ne doit dépendre d'aucune autre couche ni d'aucun framework (Spring, Hibernate, etc.).
 * **Application** : Gère l'interaction avec le monde extérieur (ici en REST). Elle transforme les requêtes externes en appels vers les Use Cases du domaine.
 * **Infrastructure** : Contient les détails d'implémentation technique (Base de données, appels API externes, envoi de mails). Elle implémente les interfaces définies dans les ports de sortie.
+
+---
+
+## Local dev notes
+
+Demo credentials (H2 seed):
+- username: demo
+- password: demo1234

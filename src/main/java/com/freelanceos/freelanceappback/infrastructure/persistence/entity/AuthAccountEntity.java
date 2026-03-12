@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.entity;
 
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

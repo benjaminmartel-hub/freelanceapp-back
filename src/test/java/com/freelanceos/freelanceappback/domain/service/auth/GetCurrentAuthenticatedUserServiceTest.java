@@ -1,7 +1,7 @@
 package com.freelanceos.freelanceappback.domain.service.auth;
 
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.AuthAccountMapper;
@@ -39,8 +39,8 @@ class GetCurrentAuthenticatedUserServiceTest {
 
         AuthAccount result = getCurrentAuthenticatedUserService.execute("alice");
 
-        assertThat(result.getUsername()).isEqualTo("alice");
-        assertThat(result.getProvider()).isEqualTo(AuthProvider.LOCAL);
+        assertThat(result.username()).isEqualTo("alice");
+        assertThat(result.provider()).isEqualTo(AuthProvider.LOCAL);
     }
 
     @Test

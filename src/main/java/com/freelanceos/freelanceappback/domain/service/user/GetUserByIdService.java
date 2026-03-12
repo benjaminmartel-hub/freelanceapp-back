@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.domain.service.user;
 
-import com.freelanceos.freelanceappback.domain.model.User;
+import com.freelanceos.freelanceappback.domain.model.user.User;
 import com.freelanceos.freelanceappback.domain.ports.in.user.GetUserByIdUseCase;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.UserMapper;

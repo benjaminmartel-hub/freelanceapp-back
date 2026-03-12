@@ -1,9 +1,9 @@
 package com.freelanceos.freelanceappback.application.rest;
 
-import com.freelanceos.freelanceappback.application.rest.dto.UserRequest;
-import com.freelanceos.freelanceappback.application.rest.dto.UserResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.user.UserRequest;
+import com.freelanceos.freelanceappback.application.rest.dto.user.UserResponse;
 import com.freelanceos.freelanceappback.application.rest.mapper.UserMapperRest;
-import com.freelanceos.freelanceappback.domain.model.User;
+import com.freelanceos.freelanceappback.domain.model.user.User;
 import com.freelanceos.freelanceappback.domain.ports.in.user.CreateUserUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.DeleteUserUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.GetAllUsersUseCase;

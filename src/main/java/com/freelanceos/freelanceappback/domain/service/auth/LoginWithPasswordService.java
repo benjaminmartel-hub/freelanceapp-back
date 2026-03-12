@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.domain.service.auth;
 
-import com.freelanceos.freelanceappback.domain.model.AuthAccount;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithPasswordUseCase;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.security.CredentialsAuthenticator;

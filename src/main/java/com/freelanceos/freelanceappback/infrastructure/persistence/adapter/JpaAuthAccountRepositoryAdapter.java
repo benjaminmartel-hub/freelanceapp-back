@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.adapter;
 
-import com.freelanceos.freelanceappback.domain.model.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.repository.SpringDataAuthAccountJpaRepository;
@@ -28,7 +28,6 @@ public class JpaAuthAccountRepositoryAdapter implements AuthAccountRepository {
 
     @Override
     public AuthAccountEntity save(AuthAccountEntity authAccount) {
-        authAccount.setId(null);
         return authAccountJpaRepository.save(authAccount);
     }
 }
