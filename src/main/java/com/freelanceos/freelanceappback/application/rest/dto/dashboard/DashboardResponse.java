@@ -4,6 +4,7 @@ import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceSummary;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MissionSummary;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyStat;
 import com.freelanceos.freelanceappback.domain.model.dashboard.TaxEstimation;
+import com.freelanceos.freelanceappback.domain.model.dashboard.ClientRevenueShare;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,6 +14,7 @@ public class DashboardResponse {
     private BigDecimal annualTurnover;
     private BigDecimal pendingPayments;
     private List<MonthlyStat> revenueHistory;
+    private List<ClientRevenueShare> clientDistribution;
     private List<InvoiceSummary> overdueInvoices;
     private List<MissionSummary> expiringMissions;
     private TaxEstimation nextTaxDeadline;
@@ -24,6 +26,7 @@ public class DashboardResponse {
                              BigDecimal annualTurnover,
                              BigDecimal pendingPayments,
                              List<MonthlyStat> revenueHistory,
+                             List<ClientRevenueShare> clientDistribution,
                              List<InvoiceSummary> overdueInvoices,
                              List<MissionSummary> expiringMissions,
                              TaxEstimation nextTaxDeadline) {
@@ -31,6 +34,7 @@ public class DashboardResponse {
         this.annualTurnover = annualTurnover;
         this.pendingPayments = pendingPayments;
         this.revenueHistory = revenueHistory;
+        this.clientDistribution = clientDistribution;
         this.overdueInvoices = overdueInvoices;
         this.expiringMissions = expiringMissions;
         this.nextTaxDeadline = nextTaxDeadline;
@@ -66,6 +70,14 @@ public class DashboardResponse {
 
     public void setRevenueHistory(List<MonthlyStat> revenueHistory) {
         this.revenueHistory = revenueHistory;
+    }
+
+    public List<ClientRevenueShare> getClientDistribution() {
+        return clientDistribution;
+    }
+
+    public void setClientDistribution(List<ClientRevenueShare> clientDistribution) {
+        this.clientDistribution = clientDistribution;
     }
 
     public List<InvoiceSummary> getOverdueInvoices() {

@@ -27,6 +27,16 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public Optional<UserEntity> findByEmailIgnoreCase(String email) {
+        return userJpaRepository.findByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public Optional<UserEntity> findByNameIgnoreCase(String name) {
+        return userJpaRepository.findByNameIgnoreCase(name);
+    }
+
+    @Override
     public UserEntity save(UserEntity user) {
         user.setId(null);
         return userJpaRepository.save(user);

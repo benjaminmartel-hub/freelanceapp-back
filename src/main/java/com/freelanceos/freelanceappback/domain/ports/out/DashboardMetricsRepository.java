@@ -5,6 +5,7 @@ import com.freelanceos.freelanceappback.domain.model.dashboard.MissionStatus;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.FiscalConfigEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.InvoiceEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.ClientRevenueAggregateProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MonthlyRevenueAggregateProjection;
 
 import java.math.BigDecimal;
@@ -24,6 +25,11 @@ public interface DashboardMetricsRepository {
                                                                       List<InvoiceStatus> statuses,
                                                                       LocalDate startDate,
                                                                       LocalDate endDateExclusive);
+
+    List<ClientRevenueAggregateProjection> findClientRevenueDistribution(Long userId,
+                                                                          List<InvoiceStatus> statuses,
+                                                                          LocalDate startDate,
+                                                                          LocalDate endDateExclusive);
 
     List<InvoiceEntity> findOverdueInvoices(Long userId, LocalDate today);
 

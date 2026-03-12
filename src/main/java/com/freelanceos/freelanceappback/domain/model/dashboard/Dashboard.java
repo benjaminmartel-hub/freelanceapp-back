@@ -8,6 +8,7 @@ public record Dashboard(
         BigDecimal annualTurnover,
         BigDecimal pendingPayments,
         List<MonthlyStat> revenueHistory,
+        List<ClientRevenueShare> clientDistribution,
         List<InvoiceSummary> overdueInvoices,
         List<MissionSummary> expiringMissions,
         TaxEstimation nextTaxDeadline

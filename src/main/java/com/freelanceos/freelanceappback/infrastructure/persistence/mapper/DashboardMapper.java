@@ -2,11 +2,13 @@ package com.freelanceos.freelanceappback.infrastructure.persistence.mapper;
 
 import com.freelanceos.freelanceappback.domain.model.dashboard.FiscalConfigSettings;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceSummary;
+import com.freelanceos.freelanceappback.domain.model.dashboard.ClientRevenueShare;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MissionSummary;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyRevenueAggregate;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.FiscalConfigEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.InvoiceEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.ClientRevenueAggregateProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MonthlyRevenueAggregateProjection;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,14 @@ public class DashboardMapper {
         return new MonthlyRevenueAggregate(
                 aggregateEntity.getYear(),
                 aggregateEntity.getMonth(),
+                aggregateEntity.getStatus(),
+                aggregateEntity.getAmount()
+        );
+    }
+
+    public ClientRevenueShare toDomain(ClientRevenueAggregateProjection aggregateEntity) {
+        return new ClientRevenueShare(
+                aggregateEntity.getClientName(),
                 aggregateEntity.getAmount()
         );
     }

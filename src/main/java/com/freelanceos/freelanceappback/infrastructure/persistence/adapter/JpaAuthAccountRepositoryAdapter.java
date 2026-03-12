@@ -28,7 +28,6 @@ public class JpaAuthAccountRepositoryAdapter implements AuthAccountRepository {
 
     @Override
     public AuthAccountEntity save(AuthAccountEntity authAccount) {
-        authAccount.setId(null);
         return authAccountJpaRepository.save(authAccount);
     }
 }

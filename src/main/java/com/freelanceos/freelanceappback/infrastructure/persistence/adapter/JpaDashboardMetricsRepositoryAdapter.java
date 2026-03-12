@@ -10,6 +10,7 @@ import com.freelanceos.freelanceappback.infrastructure.persistence.projection.Mo
 import com.freelanceos.freelanceappback.infrastructure.persistence.repository.SpringDataFiscalConfigJpaRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.repository.SpringDataInvoiceJpaRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.repository.SpringDataMissionJpaRepository;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.ClientRevenueAggregateProjection;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -50,6 +51,14 @@ public class JpaDashboardMetricsRepositoryAdapter implements DashboardMetricsRep
                                                                              LocalDate startDate,
                                                                              LocalDate endDateExclusive) {
         return invoiceJpaRepository.findMonthlyRevenueHistory(userId, statuses, startDate, endDateExclusive);
+    }
+
+    @Override
+    public List<ClientRevenueAggregateProjection> findClientRevenueDistribution(Long userId,
+                                                                                 List<InvoiceStatus> statuses,
+                                                                                 LocalDate startDate,
+                                                                                 LocalDate endDateExclusive) {
+        return invoiceJpaRepository.findClientRevenueDistribution(userId, statuses, startDate, endDateExclusive);
     }
 
     @Override

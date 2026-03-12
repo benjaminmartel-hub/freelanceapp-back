@@ -5,7 +5,6 @@ import com.freelanceos.freelanceappback.application.rest.mapper.DashboardMapperR
 import com.freelanceos.freelanceappback.domain.ports.in.dashboard.GetDashboardUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,10 +20,14 @@ public class DashboardController {
         this.dashboardMapperRest = dashboardMapperRest;
     }
 
-    @GetMapping("/{userId}")
-    public DashboardResponse getDashboard(@PathVariable Long userId) {
+    @GetMapping("/me")
+    public DashboardResponse getDashboard(java.security.Principal principal) {
+        if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+
         try {
-            return dashboardMapperRest.toResponse(getDashboardUseCase.execute(userId));
+            return dashboardMapperRest.toResponse(getDashboardUseCase.execute(principal.getName()));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }

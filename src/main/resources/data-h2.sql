@@ -1,14 +1,12 @@
 -- Demo user for product showcase
-INSERT INTO users (name, email)
-SELECT 'Demo Freelance', 'demo@freelanceos.com'
-WHERE NOT EXISTS (
-    SELECT 1 FROM users WHERE email = 'demo@freelanceos.com'
-);
+MERGE INTO users (name, email)
+KEY (email)
+VALUES ('demo', 'demo@freelanceos.com');
 
 -- Demo authentication account (username: demo, password: demo1234)
 MERGE INTO auth_accounts (username, password_hash, provider, provider_user_id)
 KEY (username)
-VALUES ('demo', '$2a$10$w5vs82jj6wRUxtf29AlzA.UFvJOzB7vWLYBqqxCBYu0hJOe9upbtS', 'LOCAL', NULL);
+VALUES ('demo', '$2a$10$iif.9MpNXoLSOpcZgNRu7OT9LJaQzl1gk.T/nK4EtpiLBpmYaQX1K', 'LOCAL', NULL);
 
 -- Fiscal configuration for tax estimation block
 INSERT INTO fiscal_configs (user_id, tax_rate, vat_enabled, declaration_period)

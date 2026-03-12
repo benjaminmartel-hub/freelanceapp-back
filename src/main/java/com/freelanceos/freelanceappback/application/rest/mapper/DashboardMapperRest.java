@@ -13,6 +13,7 @@ public class DashboardMapperRest {
                 dashboard.annualTurnover(),
                 dashboard.pendingPayments(),
                 dashboard.revenueHistory(),
+                dashboard.clientDistribution(),
                 dashboard.overdueInvoices(),
                 dashboard.expiringMissions(),
                 dashboard.nextTaxDeadline()
