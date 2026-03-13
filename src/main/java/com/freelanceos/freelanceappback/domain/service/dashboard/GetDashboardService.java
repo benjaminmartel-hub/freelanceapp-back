@@ -5,7 +5,7 @@ import com.freelanceos.freelanceappback.domain.model.dashboard.DeclarationPeriod
 import com.freelanceos.freelanceappback.domain.model.dashboard.FiscalConfigSettings;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceSummary;
-import com.freelanceos.freelanceappback.domain.model.dashboard.MissionStatus;
+import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MissionSummary;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyRevenueAggregate;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyStat;
@@ -71,7 +71,7 @@ public class GetDashboardService implements GetDashboardUseCase {
                 .map(invoiceEntity -> dashboardMapper.toDomain(invoiceEntity, today))
                 .toList();
         List<MissionSummary> expiringMissions = safeList(dashboardMetricsRepository.findExpiringMissions(
-                userId.get(), MissionStatus.ACTIVE, today.plusDays(15))).stream()
+                userId.get(), MissionStatus.ONGOING, today.plusDays(15))).stream()
                 .map(dashboardMapper::toDomain)
                 .toList();
         TaxEstimation taxEstimation = buildTaxEstimation(userId.get(), today);

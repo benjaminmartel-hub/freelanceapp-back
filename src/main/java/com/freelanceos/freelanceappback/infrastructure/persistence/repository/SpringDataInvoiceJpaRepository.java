@@ -81,4 +81,14 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
                                             @Param("status") InvoiceStatus status,
                                             @Param("today") LocalDate today);
 
+    @Query("""
+            select i.id
+            from InvoiceEntity i
+            where i.user.id = :userId
+              and i.clientName = :clientName
+            order by i.dueDate desc
+            """)
+    List<Long> findIdsByUserIdAndClientName(@Param("userId") Long userId,
+                                            @Param("clientName") String clientName);
+
 }

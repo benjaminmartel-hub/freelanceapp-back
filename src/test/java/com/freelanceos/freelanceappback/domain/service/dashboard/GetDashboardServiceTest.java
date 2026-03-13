@@ -47,7 +47,7 @@ class GetDashboardServiceTest {
                 .thenReturn(List.of());
         when(dashboardMetricsRepository.findOverdueInvoices(any(Long.class), any(LocalDate.class))).thenReturn(List.of());
         when(dashboardMetricsRepository.findExpiringMissions(any(Long.class),
-                any(com.freelanceos.freelanceappback.domain.model.dashboard.MissionStatus.class), any(LocalDate.class)))
+                any(com.freelanceos.freelanceappback.domain.model.mission.MissionStatus.class), any(LocalDate.class)))
                 .thenReturn(List.of());
         when(dashboardMetricsRepository.findFiscalConfigByUserId(1L)).thenReturn(Optional.empty());
 
@@ -80,7 +80,7 @@ class GetDashboardServiceTest {
                 .thenReturn(List.of());
         when(dashboardMetricsRepository.findOverdueInvoices(any(Long.class), any(LocalDate.class))).thenReturn(List.of());
         when(dashboardMetricsRepository.findExpiringMissions(any(Long.class),
-                any(com.freelanceos.freelanceappback.domain.model.dashboard.MissionStatus.class), any(LocalDate.class)))
+                any(com.freelanceos.freelanceappback.domain.model.mission.MissionStatus.class), any(LocalDate.class)))
                 .thenReturn(List.of());
         when(dashboardMetricsRepository.findFiscalConfigByUserId(1L)).thenReturn(Optional.empty());
 

@@ -17,9 +17,12 @@ WHERE u.email = 'demo@freelanceos.com'
       SELECT 1 FROM fiscal_configs fc WHERE fc.user_id = u.id
   );
 
--- Missions (active + finished) for "expiring missions" and portfolio view
-INSERT INTO missions (user_id, title, client_name, end_date, status)
-SELECT u.id, 'Refonte site e-commerce', 'Maison Beldi', DATEADD('DAY', 9, CURRENT_DATE), 'ACTIVE'
+-- Missions (ongoing + finished) for "expiring missions" and portfolio view
+INSERT INTO missions (user_id, title, client_name, client_contact_email, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes)
+SELECT u.id, 'Refonte site e-commerce', 'Maison Beldi', 'contact@maisonbeldi.com', 600.00, 25,
+       15000.00, DATEADD('DAY', -10, CURRENT_DATE), DATEADD('DAY', 9, CURRENT_DATE), 'ONGOING', 'TJM',
+       'Refonte UX/UI + tunnel de conversion'
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -29,8 +32,11 @@ WHERE u.email = 'demo@freelanceos.com'
         AND m.client_name = 'Maison Beldi'
   );
 
-INSERT INTO missions (user_id, title, client_name, end_date, status)
-SELECT u.id, 'Optimisation SEO technique', 'Atelier Nova', DATEADD('DAY', 14, CURRENT_DATE), 'ACTIVE'
+INSERT INTO missions (user_id, title, client_name, client_contact_email, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes)
+SELECT u.id, 'Optimisation SEO technique', 'Atelier Nova', 'hello@ateliernova.com', 450.00, 12,
+       5400.00, DATEADD('DAY', -5, CURRENT_DATE), DATEADD('DAY', 14, CURRENT_DATE), 'ONGOING', 'TJM',
+       'Audit technique + recommandations'
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -40,8 +46,11 @@ WHERE u.email = 'demo@freelanceos.com'
         AND m.client_name = 'Atelier Nova'
   );
 
-INSERT INTO missions (user_id, title, client_name, end_date, status)
-SELECT u.id, 'Migration CRM', 'Blue Orbit', DATEADD('DAY', -30, CURRENT_DATE), 'FINISHED'
+INSERT INTO missions (user_id, title, client_name, client_contact_email, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes)
+SELECT u.id, 'Migration CRM', 'Blue Orbit', 'ops@blueorbit.io', 550.00, 30,
+       16500.00, DATEADD('DAY', -60, CURRENT_DATE), DATEADD('DAY', -30, CURRENT_DATE), 'FINISHED', 'TJM',
+       'Migration terminée, support post-go live'
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
