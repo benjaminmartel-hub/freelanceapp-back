@@ -23,7 +23,7 @@ public class AdminAuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void resetPassword(@RequestBody ResetPasswordRequest request) {
         try {
-            resetPasswordUseCase.execute(request.getUsername(), request.getNewPassword());
+            resetPasswordUseCase.execute(request.username(), request.newPassword());
         } catch (IllegalArgumentException ex) {
             if ("User not found".equals(ex.getMessage())) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());

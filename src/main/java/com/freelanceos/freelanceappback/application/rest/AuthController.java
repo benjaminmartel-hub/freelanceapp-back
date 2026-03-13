@@ -53,8 +53,8 @@ public class AuthController {
     public AuthResponse register(@RequestBody RegisterRequest registerRequest) {
         try {
             AuthAccount result = registerWithPasswordUseCase.execute(
-                    registerRequest.getUsername(),
-                    registerRequest.getPassword()
+                    registerRequest.username(),
+                    registerRequest.password()
             );
             LOGGER.info("User registered with username={}", result.username());
             String token = jwtTokenService.generateToken(result.username(), result.provider().name());
@@ -68,8 +68,8 @@ public class AuthController {
     public AuthResponse login(@RequestBody LoginRequest loginRequest) {
         try {
             AuthAccount result = loginWithPasswordUseCase.execute(
-                    loginRequest.getUsername(),
-                    loginRequest.getPassword()
+                    loginRequest.username(),
+                    loginRequest.password()
             );
             LOGGER.info("User logged in with username={}", result.username());
             String token = jwtTokenService.generateToken(result.username(), result.provider().name());

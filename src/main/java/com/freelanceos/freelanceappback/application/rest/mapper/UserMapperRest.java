@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapperRest {
     public User toDomain(UserRequest userRequest) {
-        return new User(null, userRequest.getName(), userRequest.getEmail());
+        return new User(null, userRequest.name(), userRequest.email());
     }
 
     public User toDomain(Long id, UserRequest userRequest) {
-        return new User(id, userRequest.getName(), userRequest.getEmail());
+        return new User(id, userRequest.name(), userRequest.email());
     }
 
     public UserResponse toResponse(User user) {
