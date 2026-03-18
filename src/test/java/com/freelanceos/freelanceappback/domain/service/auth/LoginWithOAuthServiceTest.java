@@ -3,7 +3,9 @@ package com.freelanceos.freelanceappback.domain.service.auth;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
+import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
+import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.AuthAccountMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +28,9 @@ class LoginWithOAuthServiceTest {
 
     @Mock
     private AuthAccountMapper authAccountMapper;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private LoginWithOAuthService loginWithOAuthService;
@@ -53,10 +59,14 @@ class LoginWithOAuthServiceTest {
                 .thenReturn(new AuthAccountEntity(10L, "octocat", null, AuthProvider.GITHUB, "gh-123"));
         when(authAccountMapper.toDomain(any(AuthAccountEntity.class)))
                 .thenReturn(new AuthAccount(10L, "octocat", null, AuthProvider.GITHUB, "gh-123"));
+        when(userRepository.findByEmailIgnoreCase("octocat")).thenReturn(Optional.empty());
+        when(userRepository.findByNameIgnoreCase("octocat")).thenReturn(Optional.empty());
+        when(userRepository.save(any(UserEntity.class))).thenReturn(new UserEntity(10L, "octocat", "octocat"));
 
         AuthAccount result = loginWithOAuthService.execute(AuthProvider.GITHUB, "gh-123", "octocat");
 
         assertThat(result.username()).isEqualTo("octocat");
         assertThat(result.provider()).isEqualTo(AuthProvider.GITHUB);
+        verify(userRepository).save(any(UserEntity.class));
     }
 }
