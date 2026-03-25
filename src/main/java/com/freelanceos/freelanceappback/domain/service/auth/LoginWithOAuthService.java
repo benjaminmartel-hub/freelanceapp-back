@@ -2,6 +2,7 @@ package com.freelanceos.freelanceappback.domain.service.auth;
 
 import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
+import com.freelanceos.freelanceappback.domain.model.user.UserRole;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithOAuthUseCase;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
@@ -56,7 +57,9 @@ public class LoginWithOAuthService implements LoginWithOAuthUseCase {
         boolean exists = userRepository.findByEmailIgnoreCase(username).isPresent()
                 || userRepository.findByNameIgnoreCase(username).isPresent();
         if (!exists) {
-            userRepository.save(new UserEntity(null, username, username));
+            UserEntity userEntity = new UserEntity(null, username, username);
+            userEntity.setRoles(java.util.Set.of(UserRole.ROLE_USER));
+            userRepository.save(userEntity);
         }
     }
 }

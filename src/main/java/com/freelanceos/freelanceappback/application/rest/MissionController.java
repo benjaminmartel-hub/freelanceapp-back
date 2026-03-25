@@ -10,6 +10,7 @@ import com.freelanceos.freelanceappback.domain.ports.in.mission.GetAllMissionsUs
 import com.freelanceos.freelanceappback.domain.ports.in.mission.GetMissionDetailUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.mission.UpdateMissionUseCase;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +50,7 @@ public class MissionController {
     }
 
     @GetMapping
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public List<MissionListResponse> getMissions(Principal principal) {
         String username = resolveUsername(principal);
         return getAllMissionsUseCase.execute(username).stream()
@@ -57,6 +59,7 @@ public class MissionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public MissionDetailResponse getMissionById(@PathVariable Long id, Principal principal) {
         String username = resolveUsername(principal);
         return getMissionDetailUseCase.execute(username, id)
@@ -66,6 +69,7 @@ public class MissionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public MissionDetailResponse createMission(@Valid @RequestBody MissionRequest request, Principal principal) {
         String username = resolveUsername(principal);
         try {
@@ -80,6 +84,7 @@ public class MissionController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public MissionDetailResponse updateMission(@PathVariable Long id, @Valid @RequestBody MissionRequest request, Principal principal) {
         String username = resolveUsername(principal);
         try {

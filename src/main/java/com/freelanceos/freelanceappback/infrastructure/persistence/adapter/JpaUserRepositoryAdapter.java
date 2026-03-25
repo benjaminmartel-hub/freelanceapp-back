@@ -44,11 +44,15 @@ public class JpaUserRepositoryAdapter implements UserRepository {
 
     @Override
     public Optional<UserEntity> update(Long id, UserEntity user) {
-        if (!userJpaRepository.existsById(id)) {
-            return Optional.empty();
-        }
-        user.setId(id);
-        return Optional.of(userJpaRepository.save(user));
+        return userJpaRepository.findById(id)
+                .map(existing -> {
+                    existing.setName(user.getName());
+                    existing.setEmail(user.getEmail());
+                    if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                        existing.setRoles(user.getRoles());
+                    }
+                    return userJpaRepository.save(existing);
+                });
     }
 
     @Override

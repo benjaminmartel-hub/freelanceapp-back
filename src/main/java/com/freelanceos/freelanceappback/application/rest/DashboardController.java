@@ -4,10 +4,13 @@ import com.freelanceos.freelanceappback.application.rest.dto.dashboard.Dashboard
 import com.freelanceos.freelanceappback.application.rest.mapper.DashboardMapperRest;
 import com.freelanceos.freelanceappback.domain.ports.in.dashboard.GetDashboardUseCase;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -21,7 +24,8 @@ public class DashboardController {
     }
 
     @GetMapping("/me")
-    public DashboardResponse getDashboard(java.security.Principal principal) {
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
+    public DashboardResponse getDashboard(Principal principal) {
         if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }

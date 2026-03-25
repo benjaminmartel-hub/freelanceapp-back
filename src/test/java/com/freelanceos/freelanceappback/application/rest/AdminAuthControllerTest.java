@@ -32,7 +32,7 @@ class AdminAuthControllerTest {
     private JwtTokenService jwtTokenService;
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "demo", roles = "ADMIN")
     void resetPasswordShouldReturnNoContent() throws Exception {
         String body = objectMapper.writeValueAsString(new ResetPasswordRequest("demo", "newpassword"));
 
@@ -44,7 +44,7 @@ class AdminAuthControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "demo", roles = "ADMIN")
     void resetPasswordShouldReturnNotFoundWhenUserMissing() throws Exception {
         doThrow(new IllegalArgumentException("User not found"))
                 .when(resetPasswordUseCase).execute("missing", "newpassword");
@@ -59,7 +59,7 @@ class AdminAuthControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "demo", roles = "ADMIN")
     void resetPasswordShouldReturnBadRequestWhenInvalid() throws Exception {
         doThrow(new IllegalArgumentException("Password must be at least 8 characters"))
                 .when(resetPasswordUseCase).execute("demo", "short");

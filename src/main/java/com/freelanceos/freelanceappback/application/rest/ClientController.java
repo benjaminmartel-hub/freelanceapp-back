@@ -11,6 +11,7 @@ import com.freelanceos.freelanceappback.domain.ports.in.client.GetClientByIdUseC
 import com.freelanceos.freelanceappback.domain.ports.in.client.UpdateClientUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,6 +53,7 @@ public class ClientController {
     }
 
     @GetMapping
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public List<ClientResponse> getClients(Principal principal) {
         String username = resolveUsername(principal);
         return getAllClientsUseCase.execute(username).stream()
@@ -60,6 +62,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public ClientResponse getClientById(@PathVariable Long id, Principal principal) {
         String username = resolveUsername(principal);
         return getClientByIdUseCase.execute(username, id)
@@ -69,6 +72,7 @@ public class ClientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public ClientResponse createClient(@Valid @RequestBody ClientRequest request, Principal principal) {
         String username = resolveUsername(principal);
         try {
@@ -82,6 +86,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public ClientResponse updateClient(@PathVariable Long id,
                                        @Valid @RequestBody ClientRequest request,
                                        Principal principal) {
@@ -100,6 +105,7 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("#principal != null && #principal.name == authentication.name")
     public void deleteClient(@PathVariable Long id, Principal principal) {
         String username = resolveUsername(principal);
         boolean deleted = deleteClientUseCase.delete(username, id);

@@ -8,6 +8,10 @@ MERGE INTO auth_accounts (username, password_hash, provider, provider_user_id)
 KEY (username)
 VALUES ('demo', '$2a$10$iif.9MpNXoLSOpcZgNRu7OT9LJaQzl1gk.T/nK4EtpiLBpmYaQX1K', 'LOCAL', NULL);
 
+MERGE INTO user_roles (user_id, role)
+KEY (user_id, role)
+VALUES ((SELECT id FROM users WHERE email = 'demo@freelanceos.com'), 'ROLE_USER');
+
 -- Fiscal configuration for tax estimation block
 INSERT INTO fiscal_configs (user_id, tax_rate, vat_enabled, declaration_period)
 SELECT u.id, 0.2200, TRUE, 'MONTHLY'
