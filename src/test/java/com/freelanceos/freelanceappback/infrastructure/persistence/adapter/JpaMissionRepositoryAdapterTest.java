@@ -3,6 +3,7 @@ package com.freelanceos.freelanceappback.infrastructure.persistence.adapter;
 import com.freelanceos.freelanceappback.domain.model.mission.BillingType;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.ports.out.MissionRepository;
+import com.freelanceos.freelanceappback.infrastructure.persistence.entity.ClientEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Test;
@@ -35,9 +36,10 @@ class JpaMissionRepositoryAdapterTest {
     void saveAndFindByUserIdShouldReturnMissions() {
         UserEntity user = new UserEntity(null, "demo", "demo@freelanceos.com");
         entityManager.persist(user);
+        ClientEntity client = buildClient(user, "Maison Beldi");
         entityManager.flush();
-        missionRepository.save(buildMissionEntity(user, null, "Mission A", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5)));
-        missionRepository.save(buildMissionEntity(user, null, "Mission B", LocalDate.now().minusDays(10), LocalDate.now().plusDays(2)));
+        missionRepository.save(buildMissionEntity(user, client, null, "Mission A", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5)));
+        missionRepository.save(buildMissionEntity(user, client, null, "Mission B", LocalDate.now().minusDays(10), LocalDate.now().plusDays(2)));
 
         List<MissionEntity> missions = missionRepository.findByUserId(user.getId());
 
@@ -49,8 +51,9 @@ class JpaMissionRepositoryAdapterTest {
     void findByIdAndUserIdShouldReturnMission() {
         UserEntity user = new UserEntity(null, "demo", "demo@freelanceos.com");
         entityManager.persist(user);
+        ClientEntity client = buildClient(user, "Maison Beldi");
         entityManager.flush();
-        MissionEntity saved = missionRepository.save(buildMissionEntity(user, null, "Mission A", LocalDate.now(), LocalDate.now().plusDays(5)));
+        MissionEntity saved = missionRepository.save(buildMissionEntity(user, client, null, "Mission A", LocalDate.now(), LocalDate.now().plusDays(5)));
 
         Optional<MissionEntity> result = missionRepository.findByIdAndUserId(saved.getId(), user.getId());
 
@@ -62,9 +65,10 @@ class JpaMissionRepositoryAdapterTest {
     void updateShouldReturnUpdatedMission() {
         UserEntity user = new UserEntity(null, "demo", "demo@freelanceos.com");
         entityManager.persist(user);
+        ClientEntity client = buildClient(user, "Maison Beldi");
         entityManager.flush();
-        MissionEntity saved = missionRepository.save(buildMissionEntity(user, null, "Mission A", LocalDate.now(), LocalDate.now().plusDays(5)));
-        MissionEntity update = buildMissionEntity(user, null, "Mission Updated", LocalDate.now(), LocalDate.now().plusDays(10));
+        MissionEntity saved = missionRepository.save(buildMissionEntity(user, client, null, "Mission A", LocalDate.now(), LocalDate.now().plusDays(5)));
+        MissionEntity update = buildMissionEntity(user, client, null, "Mission Updated", LocalDate.now(), LocalDate.now().plusDays(10));
 
         Optional<MissionEntity> result = missionRepository.update(saved.getId(), update);
 
@@ -77,8 +81,9 @@ class JpaMissionRepositoryAdapterTest {
     void existsOverlappingOngoingMissionShouldDetectOverlap() {
         UserEntity user = new UserEntity(null, "demo", "demo@freelanceos.com");
         entityManager.persist(user);
+        ClientEntity client = buildClient(user, "Maison Beldi");
         entityManager.flush();
-        missionRepository.save(buildMissionEntity(user, null, "Mission A", LocalDate.now().minusDays(2), LocalDate.now().plusDays(5)));
+        missionRepository.save(buildMissionEntity(user, client, null, "Mission A", LocalDate.now().minusDays(2), LocalDate.now().plusDays(5)));
 
         boolean overlaps = missionRepository.existsOverlappingOngoingMission(
                 user.getId(), LocalDate.now().minusDays(1), LocalDate.now().plusDays(2), null);
@@ -93,18 +98,25 @@ class JpaMissionRepositoryAdapterTest {
     void findExpiringMissionsShouldReturnSortedByEndDate() {
         UserEntity user = new UserEntity(null, "demo", "demo@freelanceos.com");
         entityManager.persist(user);
+        ClientEntity client = buildClient(user, "Maison Beldi");
         entityManager.flush();
-        MissionEntity later = missionRepository.save(buildMissionEntity(user, null, "Later", LocalDate.now(), LocalDate.now().plusDays(10)));
-        MissionEntity sooner = missionRepository.save(buildMissionEntity(user, null, "Sooner", LocalDate.now(), LocalDate.now().plusDays(3)));
+        MissionEntity later = missionRepository.save(buildMissionEntity(user, client, null, "Later", LocalDate.now(), LocalDate.now().plusDays(10)));
+        MissionEntity sooner = missionRepository.save(buildMissionEntity(user, client, null, "Sooner", LocalDate.now(), LocalDate.now().plusDays(3)));
 
         List<MissionEntity> result = missionRepository.findExpiringMissions(user.getId(), MissionStatus.ONGOING, LocalDate.now().plusDays(15));
 
         assertThat(result).containsExactly(sooner, later);
     }
 
-    private MissionEntity buildMissionEntity(UserEntity user, Long id, String title, LocalDate startDate, LocalDate endDate) {
-        return new MissionEntity(id, user, title, "Maison Beldi", "contact@maisonbeldi.com",
+    private ClientEntity buildClient(UserEntity user, String name) {
+        ClientEntity client = new ClientEntity(null, user, name, "contact@maisonbeldi.com");
+        entityManager.persist(client);
+        return client;
+    }
+
+    private MissionEntity buildMissionEntity(UserEntity user, ClientEntity client, Long id, String title, LocalDate startDate, LocalDate endDate) {
+        return new MissionEntity(id, user, client, title,
                 BigDecimal.valueOf(600), 10, BigDecimal.valueOf(6000), startDate, endDate,
-                MissionStatus.ONGOING, BillingType.TJM, "Notes");
+                MissionStatus.ONGOING, BillingType.TJM, "Notes", "EUR");
     }
 }

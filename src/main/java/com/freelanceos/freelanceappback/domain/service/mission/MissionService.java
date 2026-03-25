@@ -1,5 +1,7 @@
 package com.freelanceos.freelanceappback.domain.service.mission;
 
+import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
+import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
@@ -7,9 +9,11 @@ import com.freelanceos.freelanceappback.domain.ports.in.mission.CreateMissionUse
 import com.freelanceos.freelanceappback.domain.ports.in.mission.GetAllMissionsUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.mission.GetMissionDetailUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.mission.UpdateMissionUseCase;
+import com.freelanceos.freelanceappback.domain.ports.out.ClientRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.InvoiceRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.MissionRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
+import com.freelanceos.freelanceappback.infrastructure.persistence.entity.ClientEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.MissionMapper;
@@ -29,15 +33,18 @@ public class MissionService implements CreateMissionUseCase,
     private final MissionRepository missionRepository;
     private final UserRepository userRepository;
     private final InvoiceRepository invoiceRepository;
+    private final ClientRepository clientRepository;
     private final MissionMapper missionMapper;
 
     public MissionService(MissionRepository missionRepository,
                           UserRepository userRepository,
                           InvoiceRepository invoiceRepository,
+                          ClientRepository clientRepository,
                           MissionMapper missionMapper) {
         this.missionRepository = missionRepository;
         this.userRepository = userRepository;
         this.invoiceRepository = invoiceRepository;
+        this.clientRepository = clientRepository;
         this.missionMapper = missionMapper;
     }
 
@@ -56,30 +63,24 @@ public class MissionService implements CreateMissionUseCase,
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return missionRepository.findByIdAndUserId(id, userId)
                 .map(missionMapper::toDomain)
-                .map(mission -> new MissionDetail(
-                        mission.id(),
-                        mission.userId(),
-                        mission.title(),
-                        mission.clientName(),
-                        mission.clientContactEmail(),
-                        mission.dailyRate(),
-                        mission.expectedDuration(),
-                        mission.totalBudgetEstimated(),
-                        mission.startDate(),
-                        mission.endDate(),
-                        mission.status(),
-                        mission.billingType(),
-                        mission.internalNotes(),
-                        invoiceRepository.findIdsByUserIdAndClientName(userId, mission.clientName())
-                ));
+                .map(mission -> {
+                    List<MissionInvoice> invoices = invoiceRepository
+                            .findSummariesByUserIdAndMissionId(userId, mission.id()).stream()
+                            .map(missionMapper::toDomain)
+                            .toList();
+                    BigDecimal totalInvoiced = invoiceRepository
+                            .sumTotalHtByUserIdAndMissionId(userId, mission.id());
+                    return missionMapper.toDomain(mission, invoices, totalInvoiced);
+                });
     }
 
     @Override
     public Mission execute(String username, Mission missionToCreate) {
         UserEntity user = resolveUser(username);
-        Mission normalized = normalizeMission(missionToCreate, user.getId());
+        ClientEntity client = resolveClient(user.getId(), missionToCreate.client());
+        Mission normalized = normalizeMission(missionToCreate, user.getId(), client);
         validateNoOverlap(user.getId(), normalized.startDate(), normalized.endDate(), null, normalized.status());
-        MissionEntity saved = missionRepository.save(missionMapper.toEntity(normalized, user));
+        MissionEntity saved = missionRepository.save(missionMapper.toEntity(normalized, user, client));
         return missionMapper.toDomain(saved);
     }
 
@@ -92,9 +93,10 @@ public class MissionService implements CreateMissionUseCase,
             return Optional.empty();
         }
 
-        Mission normalized = normalizeMission(missionToUpdate, userId);
+        ClientEntity client = resolveClient(userId, missionToUpdate.client());
+        Mission normalized = normalizeMission(missionToUpdate, userId, client);
         validateNoOverlap(userId, normalized.startDate(), normalized.endDate(), id, normalized.status());
-        MissionEntity updated = missionRepository.update(id, missionMapper.toEntity(normalized, existing.get().getUser()))
+        MissionEntity updated = missionRepository.update(id, missionMapper.toEntity(normalized, existing.get().getUser(), client))
                 .orElseThrow(() -> new IllegalStateException("Mission not found"));
         return Optional.of(missionMapper.toDomain(updated));
     }
@@ -117,27 +119,17 @@ public class MissionService implements CreateMissionUseCase,
                 .toList();
     }
 
-    private Mission normalizeMission(Mission mission, Long userId) {
+    private Mission normalizeMission(Mission mission, Long userId, ClientEntity client) {
         BigDecimal totalBudget = mission.totalBudgetEstimated();
         if (totalBudget == null && mission.dailyRate() != null && mission.expectedDuration() != null) {
             totalBudget = mission.dailyRate().multiply(BigDecimal.valueOf(mission.expectedDuration()));
         }
+        String currency = mission.currency();
+        if (currency == null || currency.isBlank()) {
+            currency = "EUR";
+        }
 
-        return new Mission(
-                mission.id(),
-                userId,
-                mission.title(),
-                mission.clientName(),
-                mission.clientContactEmail(),
-                mission.dailyRate(),
-                mission.expectedDuration(),
-                totalBudget,
-                mission.startDate(),
-                mission.endDate(),
-                mission.status(),
-                mission.billingType(),
-                mission.internalNotes()
-        );
+        return missionMapper.toDomain(mission, userId, client, totalBudget, currency);
     }
 
     private void validateNoOverlap(Long userId,
@@ -166,5 +158,13 @@ public class MissionService implements CreateMissionUseCase,
 
         return userRepository.findByNameIgnoreCase(username)
                 .map(UserEntity::getId);
+    }
+
+    private ClientEntity resolveClient(Long userId, ClientSummary client) {
+        if (client == null || client.id() == null) {
+            throw new IllegalArgumentException("Client is required");
+        }
+        return clientRepository.findByIdAndUserId(client.id(), userId)
+                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
     }
 }

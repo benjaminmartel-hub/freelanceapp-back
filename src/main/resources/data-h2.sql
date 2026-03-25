@@ -17,142 +17,317 @@ WHERE u.email = 'demo@freelanceos.com'
       SELECT 1 FROM fiscal_configs fc WHERE fc.user_id = u.id
   );
 
--- Missions (ongoing + finished) for "expiring missions" and portfolio view
-INSERT INTO missions (user_id, title, client_name, client_contact_email, daily_rate, expected_duration,
-                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes)
-SELECT u.id, 'Refonte site e-commerce', 'Maison Beldi', 'contact@maisonbeldi.com', 600.00, 25,
-       15000.00, DATEADD('DAY', -10, CURRENT_DATE), DATEADD('DAY', 9, CURRENT_DATE), 'ONGOING', 'TJM',
-       'Refonte UX/UI + tunnel de conversion'
+-- Clients
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Maison Beldi', 'contact@maisonbeldi.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Maison Beldi'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Atelier Nova', 'hello@ateliernova.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Atelier Nova'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Blue Orbit', 'ops@blueorbit.io', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Blue Orbit'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Studio Atlas', 'hello@studioatlas.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Studio Atlas'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Cobalt Labs', 'contact@cobaltlabs.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Cobalt Labs'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Pixel Harbor', 'hello@pixelharbor.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Pixel Harbor'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Nordic Scale', 'contact@nordicscale.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Nordic Scale'
+  );
+
+INSERT INTO clients (user_id, name, contact_email, created_at, updated_at)
+SELECT u.id, 'Nova Factory', 'contact@novafactory.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM clients c WHERE c.user_id = u.id AND c.name = 'Nova Factory'
+  );
+
+-- Missions (ongoing + finished) for "expiring missions" and portfolio view
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Refonte site e-commerce', 600.00, 25,
+       15000.00, DATEADD('DAY', -10, CURRENT_DATE), DATEADD('DAY', 9, CURRENT_DATE), 'ONGOING', 'TJM',
+       'Refonte UX/UI + tunnel de conversion', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Maison Beldi'
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM missions m
       WHERE m.user_id = u.id
         AND m.title = 'Refonte site e-commerce'
-        AND m.client_name = 'Maison Beldi'
+        AND m.client_id = c.id
   );
 
-INSERT INTO missions (user_id, title, client_name, client_contact_email, daily_rate, expected_duration,
-                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes)
-SELECT u.id, 'Optimisation SEO technique', 'Atelier Nova', 'hello@ateliernova.com', 450.00, 12,
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Optimisation SEO technique', 450.00, 12,
        5400.00, DATEADD('DAY', -5, CURRENT_DATE), DATEADD('DAY', 14, CURRENT_DATE), 'ONGOING', 'TJM',
-       'Audit technique + recommandations'
+       'Audit technique + recommandations', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Atelier Nova'
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM missions m
       WHERE m.user_id = u.id
         AND m.title = 'Optimisation SEO technique'
-        AND m.client_name = 'Atelier Nova'
+        AND m.client_id = c.id
   );
 
-INSERT INTO missions (user_id, title, client_name, client_contact_email, daily_rate, expected_duration,
-                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes)
-SELECT u.id, 'Migration CRM', 'Blue Orbit', 'ops@blueorbit.io', 550.00, 30,
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Migration CRM', 550.00, 30,
        16500.00, DATEADD('DAY', -60, CURRENT_DATE), DATEADD('DAY', -30, CURRENT_DATE), 'FINISHED', 'TJM',
-       'Migration terminée, support post-go live'
+       'Migration terminee, support post-go live', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Blue Orbit'
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM missions m
       WHERE m.user_id = u.id
         AND m.title = 'Migration CRM'
-        AND m.client_name = 'Blue Orbit'
+        AND m.client_id = c.id
+  );
+
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Campagne branding', 500.00, 8,
+       4000.00, DATEADD('DAY', -120, CURRENT_DATE), DATEADD('DAY', -90, CURRENT_DATE), 'FINISHED', 'TJM',
+       'Identite visuelle et assets', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Studio Atlas'
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM missions m
+      WHERE m.user_id = u.id
+        AND m.title = 'Campagne branding'
+        AND m.client_id = c.id
+  );
+
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Audit produit', 650.00, 6,
+       3900.00, DATEADD('DAY', -180, CURRENT_DATE), DATEADD('DAY', -150, CURRENT_DATE), 'FINISHED', 'TJM',
+       'Audit et recommandations', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Cobalt Labs'
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM missions m
+      WHERE m.user_id = u.id
+        AND m.title = 'Audit produit'
+        AND m.client_id = c.id
+  );
+
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Optimisation conversion', 580.00, 12,
+       6960.00, DATEADD('DAY', -210, CURRENT_DATE), DATEADD('DAY', -170, CURRENT_DATE), 'FINISHED', 'TJM',
+       'A/B tests et analytics', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Pixel Harbor'
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM missions m
+      WHERE m.user_id = u.id
+        AND m.title = 'Optimisation conversion'
+        AND m.client_id = c.id
+  );
+
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Roadmap data', 520.00, 7,
+       3640.00, DATEADD('DAY', -300, CURRENT_DATE), DATEADD('DAY', -260, CURRENT_DATE), 'FINISHED', 'TJM',
+       'Planification data platform', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Nordic Scale'
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM missions m
+      WHERE m.user_id = u.id
+        AND m.title = 'Roadmap data'
+        AND m.client_id = c.id
+  );
+
+INSERT INTO missions (user_id, client_id, title, daily_rate, expected_duration,
+                      total_budget_estimated, start_date, end_date, status, billing_type, internal_notes, currency,
+                      created_at, updated_at)
+SELECT u.id, c.id, 'Prototype MVP', 480.00, 15,
+       7200.00, DATEADD('DAY', -15, CURRENT_DATE), DATEADD('DAY', 20, CURRENT_DATE), 'ONGOING', 'TJM',
+       'Prototype fonctionnel', 'EUR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM users u
+JOIN clients c ON c.user_id = u.id AND c.name = 'Nova Factory'
+WHERE u.email = 'demo@freelanceos.com'
+  AND NOT EXISTS (
+      SELECT 1 FROM missions m
+      WHERE m.user_id = u.id
+        AND m.title = 'Prototype MVP'
+        AND m.client_id = c.id
   );
 
 -- Invoices for dashboard metrics and monthly history
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Maison Beldi', 'PAID', DATEADD('DAY', -5, CURRENT_DATE), 2800.00, 3360.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Maison Beldi'),
+       'INV-2026-001', 'PAID', DATEADD('DAY', -5, CURRENT_DATE), 2800.00, 3360.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Maison Beldi'
-        AND i.status = 'PAID'
-        AND i.due_date = DATEADD('DAY', -5, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-001'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Atelier Nova', 'SENT', DATEADD('DAY', 7, CURRENT_DATE), 1600.00, 1920.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Atelier Nova'),
+       'INV-2026-002', 'SENT', DATEADD('DAY', 7, CURRENT_DATE), 1600.00, 1920.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Atelier Nova'
-        AND i.status = 'SENT'
-        AND i.due_date = DATEADD('DAY', 7, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-002'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Blue Orbit', 'SENT', DATEADD('DAY', -12, CURRENT_DATE), 2400.00, 2880.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Blue Orbit'),
+       'INV-2026-003', 'SENT', DATEADD('DAY', -12, CURRENT_DATE), 2400.00, 2880.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Blue Orbit'
-        AND i.status = 'SENT'
-        AND i.due_date = DATEADD('DAY', -12, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-003'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Studio Atlas', 'PAID', DATEADD('MONTH', -1, CURRENT_DATE), 1900.00, 2280.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Studio Atlas'),
+       'INV-2026-004', 'PAID', DATEADD('MONTH', -1, CURRENT_DATE), 1900.00, 2280.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Studio Atlas'
-        AND i.status = 'PAID'
-        AND i.due_date = DATEADD('MONTH', -1, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-004'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Cobalt Labs', 'PAID', DATEADD('MONTH', -2, CURRENT_DATE), 2250.00, 2700.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Cobalt Labs'),
+       'INV-2026-005', 'PAID', DATEADD('MONTH', -2, CURRENT_DATE), 2250.00, 2700.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Cobalt Labs'
-        AND i.status = 'PAID'
-        AND i.due_date = DATEADD('MONTH', -2, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-005'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Pixel Harbor', 'PAID', DATEADD('MONTH', -4, CURRENT_DATE), 3100.00, 3720.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Pixel Harbor'),
+       'INV-2026-006', 'PAID', DATEADD('MONTH', -4, CURRENT_DATE), 3100.00, 3720.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Pixel Harbor'
-        AND i.status = 'PAID'
-        AND i.due_date = DATEADD('MONTH', -4, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-006'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Nordic Scale', 'PAID', DATEADD('MONTH', -7, CURRENT_DATE), 1700.00, 2040.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Nordic Scale'),
+       'INV-2026-007', 'PAID', DATEADD('MONTH', -7, CURRENT_DATE), 1700.00, 2040.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Nordic Scale'
-        AND i.status = 'PAID'
-        AND i.due_date = DATEADD('MONTH', -7, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-007'
   );
 
-INSERT INTO invoices (user_id, client_name, status, due_date, total_ht, total_ttc)
-SELECT u.id, 'Nova Factory', 'DRAFT', DATEADD('DAY', 20, CURRENT_DATE), 1300.00, 1560.00
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+SELECT u.id,
+       (SELECT MIN(m.id)
+        FROM missions m
+        JOIN clients c ON c.id = m.client_id
+        WHERE m.user_id = u.id AND c.name = 'Nova Factory'),
+       'INV-2026-008', 'DRAFT', DATEADD('DAY', 20, CURRENT_DATE), 1300.00, 1560.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
       SELECT 1 FROM invoices i
       WHERE i.user_id = u.id
-        AND i.client_name = 'Nova Factory'
-        AND i.status = 'DRAFT'
-        AND i.due_date = DATEADD('DAY', 20, CURRENT_DATE)
+        AND i.invoice_number = 'INV-2026-008'
   );

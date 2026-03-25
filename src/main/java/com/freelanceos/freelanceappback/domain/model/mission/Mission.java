@@ -3,11 +3,12 @@ package com.freelanceos.freelanceappback.domain.model.mission;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
+
 public record Mission(Long id,
                       Long userId,
                       String title,
-                      String clientName,
-                      String clientContactEmail,
+                      ClientSummary client,
                       BigDecimal dailyRate,
                       Integer expectedDuration,
                       BigDecimal totalBudgetEstimated,
@@ -15,5 +16,6 @@ public record Mission(Long id,
                       LocalDate endDate,
                       MissionStatus status,
                       BillingType billingType,
-                      String internalNotes) {
+                      String internalNotes,
+                      String currency) {
 }

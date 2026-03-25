@@ -1,13 +1,22 @@
 package com.freelanceos.freelanceappback.application.rest.mapper;
 
-import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionDetail;
-import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionList;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionDetailResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionFinancialsResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionClientResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionInvoiceResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionListResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionPeriodResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionRequest;
+import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
+import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
+import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Component
 public class MissionMapperRest {
@@ -16,8 +25,7 @@ public class MissionMapperRest {
                 null,
                 null,
                 request.title(),
-                request.clientName(),
-                request.clientContactEmail(),
+                new ClientSummary(request.clientId(), null),
                 request.dailyRate(),
                 request.expectedDuration(),
                 request.totalBudgetEstimated(),
@@ -25,7 +33,8 @@ public class MissionMapperRest {
                 request.endDate(),
                 request.status(),
                 request.billingType(),
-                request.internalNotes()
+                request.internalNotes(),
+                request.currency()
         );
     }
 
@@ -34,8 +43,7 @@ public class MissionMapperRest {
                 id,
                 null,
                 request.title(),
-                request.clientName(),
-                request.clientContactEmail(),
+                new ClientSummary(request.clientId(), null),
                 request.dailyRate(),
                 request.expectedDuration(),
                 request.totalBudgetEstimated(),
@@ -43,53 +51,85 @@ public class MissionMapperRest {
                 request.endDate(),
                 request.status(),
                 request.billingType(),
-                request.internalNotes()
+                request.internalNotes(),
+                request.currency()
         );
     }
 
-    public MissionList toList(Mission mission) {
-        return new MissionList(
+    public MissionListResponse toList(Mission mission) {
+        return new MissionListResponse(
                 mission.id(),
-                mission.clientName(),
+                mission.title(),
+                new MissionClientResponse(mission.client().id(), mission.client().name()),
                 mission.dailyRate(),
+                mission.currency(),
                 mission.status(),
+                mission.endDate(),
                 calculateTimeProgressPercent(mission.startDate(), mission.endDate(), LocalDate.now())
         );
     }
 
-    public MissionDetail toDetail(com.freelanceos.freelanceappback.domain.model.mission.MissionDetail missionDetail) {
-        return new MissionDetail(
-                missionDetail.id(),
-                missionDetail.title(),
-                missionDetail.clientName(),
-                missionDetail.clientContactEmail(),
+    public MissionDetailResponse toDetail(MissionDetail missionDetail) {
+        MissionClientResponse client = new MissionClientResponse(
+                missionDetail.client().id(),
+                missionDetail.client().name()
+        );
+        MissionFinancialsResponse financials = new MissionFinancialsResponse(
                 missionDetail.dailyRate(),
-                missionDetail.expectedDuration(),
                 missionDetail.totalBudgetEstimated(),
+                missionDetail.totalInvoiced(),
+                missionDetail.currency()
+        );
+        MissionPeriodResponse period = new MissionPeriodResponse(
                 missionDetail.startDate(),
                 missionDetail.endDate(),
+                calculateTimeProgressPercent(missionDetail.startDate(), missionDetail.endDate(), LocalDate.now())
+        );
+        return new MissionDetailResponse(
+                missionDetail.id(),
+                missionDetail.title(),
                 missionDetail.status(),
-                missionDetail.billingType(),
-                missionDetail.internalNotes(),
-                missionDetail.invoiceIds()
+                client,
+                financials,
+                period,
+                missionDetail.invoices().stream()
+                        .map(this::toInvoice)
+                        .toList()
         );
     }
 
-    public MissionDetail toDetail(Mission mission, java.util.List<Long> invoiceIds) {
-        return new MissionDetail(
-                mission.id(),
-                mission.title(),
-                mission.clientName(),
-                mission.clientContactEmail(),
+    public MissionDetailResponse toDetail(Mission mission, List<MissionInvoice> invoices, BigDecimal totalInvoiced) {
+        MissionClientResponse client = new MissionClientResponse(mission.client().id(), mission.client().name());
+        MissionFinancialsResponse financials = new MissionFinancialsResponse(
                 mission.dailyRate(),
-                mission.expectedDuration(),
                 mission.totalBudgetEstimated(),
+                totalInvoiced,
+                mission.currency()
+        );
+        MissionPeriodResponse period = new MissionPeriodResponse(
                 mission.startDate(),
                 mission.endDate(),
+                calculateTimeProgressPercent(mission.startDate(), mission.endDate(), LocalDate.now())
+        );
+        return new MissionDetailResponse(
+                mission.id(),
+                mission.title(),
                 mission.status(),
-                mission.billingType(),
-                mission.internalNotes(),
-                invoiceIds
+                client,
+                financials,
+                period,
+                invoices.stream()
+                        .map(this::toInvoice)
+                        .toList()
+        );
+    }
+
+    private MissionInvoiceResponse toInvoice(MissionInvoice invoice) {
+        return new MissionInvoiceResponse(
+                invoice.id(),
+                invoice.number(),
+                invoice.amount(),
+                invoice.status()
         );
     }
 

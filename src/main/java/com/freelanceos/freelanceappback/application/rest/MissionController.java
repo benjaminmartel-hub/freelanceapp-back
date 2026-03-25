@@ -1,7 +1,7 @@
 package com.freelanceos.freelanceappback.application.rest;
 
-import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionDetail;
-import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionList;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionDetailResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionListResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionRequest;
 import com.freelanceos.freelanceappback.application.rest.mapper.MissionMapperRest;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import jakarta.validation.Valid;
 
 import java.security.Principal;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -47,7 +49,7 @@ public class MissionController {
     }
 
     @GetMapping
-    public List<MissionList> getMissions(Principal principal) {
+    public List<MissionListResponse> getMissions(Principal principal) {
         String username = resolveUsername(principal);
         return getAllMissionsUseCase.execute(username).stream()
                 .map(missionMapperRest::toList)
@@ -55,7 +57,7 @@ public class MissionController {
     }
 
     @GetMapping("/{id}")
-    public MissionDetail getMissionById(@PathVariable Long id, Principal principal) {
+    public MissionDetailResponse getMissionById(@PathVariable Long id, Principal principal) {
         String username = resolveUsername(principal);
         return getMissionDetailUseCase.execute(username, id)
                 .map(missionMapperRest::toDetail)
@@ -64,12 +66,12 @@ public class MissionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MissionDetail createMission(@RequestBody MissionRequest request, Principal principal) {
+    public MissionDetailResponse createMission(@Valid @RequestBody MissionRequest request, Principal principal) {
         String username = resolveUsername(principal);
         try {
             Mission missionToCreate = missionMapperRest.toDomain(request);
             Mission created = createMissionUseCase.execute(username, missionToCreate);
-            return missionMapperRest.toDetail(created, java.util.List.of());
+            return missionMapperRest.toDetail(created, java.util.List.of(), BigDecimal.ZERO);
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         } catch (IllegalArgumentException ex) {
@@ -78,12 +80,12 @@ public class MissionController {
     }
 
     @PutMapping("/{id}")
-    public MissionDetail updateMission(@PathVariable Long id, @RequestBody MissionRequest request, Principal principal) {
+    public MissionDetailResponse updateMission(@PathVariable Long id, @Valid @RequestBody MissionRequest request, Principal principal) {
         String username = resolveUsername(principal);
         try {
             Mission missionToUpdate = missionMapperRest.toDomain(id, request);
             return updateMissionUseCase.execute(username, id, missionToUpdate)
-                    .map(updated -> missionMapperRest.toDetail(updated, java.util.List.of()))
+                    .map(updated -> missionMapperRest.toDetail(updated, java.util.List.of(), BigDecimal.ZERO))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mission not found"));
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());

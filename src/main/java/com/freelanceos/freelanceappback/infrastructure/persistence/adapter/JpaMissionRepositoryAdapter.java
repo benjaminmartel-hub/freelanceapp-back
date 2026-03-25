@@ -20,12 +20,12 @@ public class JpaMissionRepositoryAdapter implements MissionRepository {
 
     @Override
     public List<MissionEntity> findByUserId(Long userId) {
-        return missionJpaRepository.findByUserIdOrderByStartDateDesc(userId);
+        return missionJpaRepository.findByUserIdAndDeletedAtIsNullOrderByStartDateDesc(userId);
     }
 
     @Override
     public Optional<MissionEntity> findByIdAndUserId(Long id, Long userId) {
-        return missionJpaRepository.findByIdAndUserId(id, userId);
+        return missionJpaRepository.findByIdAndUserIdAndDeletedAtIsNull(id, userId);
     }
 
     @Override

@@ -11,15 +11,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SpringDataMissionJpaRepository extends JpaRepository<MissionEntity, Long> {
-    List<MissionEntity> findByUserIdOrderByStartDateDesc(Long userId);
+    List<MissionEntity> findByUserIdAndDeletedAtIsNullOrderByStartDateDesc(Long userId);
 
-    Optional<MissionEntity> findByIdAndUserId(Long id, Long userId);
+    Optional<MissionEntity> findByIdAndUserIdAndDeletedAtIsNull(Long id, Long userId);
 
     @Query("""
             select m
             from MissionEntity m
             where m.user.id = :userId
               and m.status = :status
+              and m.deletedAt is null
               and m.endDate < :endDateLimit
             order by m.endDate asc
             """)
@@ -32,6 +33,7 @@ public interface SpringDataMissionJpaRepository extends JpaRepository<MissionEnt
             from MissionEntity m
             where m.user.id = :userId
               and m.status = :status
+              and m.deletedAt is null
               and (:excludeId is null or m.id <> :excludeId)
               and m.startDate <= :endDate
               and m.endDate >= :startDate
