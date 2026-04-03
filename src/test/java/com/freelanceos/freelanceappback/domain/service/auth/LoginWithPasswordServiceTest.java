@@ -4,6 +4,7 @@ import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.security.CredentialsAuthenticator;
+import com.freelanceos.freelanceappback.domain.exception.UnauthorizedException;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.AuthAccountMapper;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class LoginWithPasswordServiceTest {
         when(credentialsAuthenticator.authenticate("alice", "bad")).thenReturn(false);
 
         assertThatThrownBy(() -> loginWithPasswordService.execute("alice", "bad"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(UnauthorizedException.class)
                 .hasMessage("Invalid credentials");
     }
 }

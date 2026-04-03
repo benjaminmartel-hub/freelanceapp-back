@@ -2,6 +2,7 @@ package com.freelanceos.freelanceappback.application.rest;
 
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionRequest;
 import com.freelanceos.freelanceappback.application.rest.mapper.MissionMapperRest;
+import com.freelanceos.freelanceappback.application.rest.AuthenticatedUserResolver;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
@@ -49,6 +50,11 @@ class MissionControllerTest {
         @Bean
         MissionMapperRest missionMapperRest() {
             return new MissionMapperRest();
+        }
+
+        @Bean
+        AuthenticatedUserResolver authenticatedUserResolver() {
+            return new AuthenticatedUserResolver();
         }
     }
 
@@ -110,6 +116,8 @@ class MissionControllerTest {
         mockMvc.perform(get("/missions/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.expectedDuration").value(10))
+                .andExpect(jsonPath("$.internalNotes").value("Notes"))
                 .andExpect(jsonPath("$.client.id").value(10))
                 .andExpect(jsonPath("$.client.name").value("Maison Beldi"))
                 .andExpect(jsonPath("$.financials.totalInvoiced").value(1500))
@@ -136,6 +144,8 @@ class MissionControllerTest {
                 .content(buildRequestJson("Audit", 600, 10, 6000, startDate, endDate)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.expectedDuration").value(10))
+                .andExpect(jsonPath("$.internalNotes").value("Notes"))
                 .andExpect(jsonPath("$.client.id").value(10))
                 .andExpect(jsonPath("$.client.name").value("Maison Beldi"))
                 .andExpect(jsonPath("$.invoices").isArray());
@@ -160,6 +170,8 @@ class MissionControllerTest {
                 .content(buildRequestJson("Audit Updated", 650, 10, 6500, startDate, endDate)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.expectedDuration").value(10))
+                .andExpect(jsonPath("$.internalNotes").value("Notes"))
                 .andExpect(jsonPath("$.financials.dailyRate").value(650));
     }
 

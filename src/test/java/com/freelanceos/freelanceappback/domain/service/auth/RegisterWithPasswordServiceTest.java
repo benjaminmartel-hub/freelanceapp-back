@@ -5,6 +5,7 @@ import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.security.PasswordHasher;
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.AuthAccountMapper;
@@ -69,7 +70,7 @@ class RegisterWithPasswordServiceTest {
                 .thenReturn(Optional.of(new AuthAccountEntity(1L, "alice", "hash", AuthProvider.LOCAL, null)));
 
         assertThatThrownBy(() -> registerWithPasswordService.execute("alice", "secret"))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessage("Username already exists");
     }
 }

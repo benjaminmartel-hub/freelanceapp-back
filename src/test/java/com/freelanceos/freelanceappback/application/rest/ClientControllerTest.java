@@ -3,6 +3,7 @@ package com.freelanceos.freelanceappback.application.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.freelanceos.freelanceappback.application.rest.dto.client.ClientRequest;
 import com.freelanceos.freelanceappback.application.rest.mapper.ClientMapperRest;
+import com.freelanceos.freelanceappback.application.rest.AuthenticatedUserResolver;
 import com.freelanceos.freelanceappback.domain.model.client.Client;
 import com.freelanceos.freelanceappback.domain.ports.in.client.CreateClientUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.client.DeleteClientUseCase;
@@ -44,6 +45,11 @@ class ClientControllerTest {
         @Bean
         ClientMapperRest clientMapperRest() {
             return new ClientMapperRest();
+        }
+
+        @Bean
+        AuthenticatedUserResolver authenticatedUserResolver() {
+            return new AuthenticatedUserResolver();
         }
     }
 

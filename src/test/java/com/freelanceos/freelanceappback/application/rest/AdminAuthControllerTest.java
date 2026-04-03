@@ -2,6 +2,8 @@ package com.freelanceos.freelanceappback.application.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.freelanceos.freelanceappback.application.rest.dto.auth.ResetPasswordRequest;
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.ResetPasswordUseCase;
 import com.freelanceos.freelanceappback.infrastructure.security.JwtTokenService;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,7 @@ class AdminAuthControllerTest {
     @Test
     @WithMockUser(username = "demo", roles = "ADMIN")
     void resetPasswordShouldReturnNotFoundWhenUserMissing() throws Exception {
-        doThrow(new IllegalArgumentException("User not found"))
+        doThrow(new NotFoundException("User not found"))
                 .when(resetPasswordUseCase).execute("missing", "newpassword");
 
         String body = objectMapper.writeValueAsString(new ResetPasswordRequest("missing", "newpassword"));
@@ -61,7 +63,7 @@ class AdminAuthControllerTest {
     @Test
     @WithMockUser(username = "demo", roles = "ADMIN")
     void resetPasswordShouldReturnBadRequestWhenInvalid() throws Exception {
-        doThrow(new IllegalArgumentException("Password must be at least 8 characters"))
+        doThrow(new BadRequestException("Password must be at least 8 characters"))
                 .when(resetPasswordUseCase).execute("demo", "short");
 
         String body = objectMapper.writeValueAsString(new ResetPasswordRequest("demo", "short"));

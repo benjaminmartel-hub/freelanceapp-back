@@ -4,6 +4,9 @@ import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionDeta
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionListResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionRequest;
 import com.freelanceos.freelanceappback.application.rest.mapper.MissionMapperRest;
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.ports.in.mission.CreateMissionUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.mission.GetAllMissionsUseCase;
@@ -11,8 +14,6 @@ import com.freelanceos.freelanceappback.domain.ports.in.mission.GetMissionDetail
 import com.freelanceos.freelanceappback.domain.ports.in.mission.UpdateMissionUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,82 +37,85 @@ public class MissionController {
     private final GetAllMissionsUseCase getAllMissionsUseCase;
     private final GetMissionDetailUseCase getMissionDetailUseCase;
     private final MissionMapperRest missionMapperRest;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     public MissionController(CreateMissionUseCase createMissionUseCase,
                              UpdateMissionUseCase updateMissionUseCase,
                              GetAllMissionsUseCase getAllMissionsUseCase,
                              GetMissionDetailUseCase getMissionDetailUseCase,
-                             MissionMapperRest missionMapperRest) {
+                             MissionMapperRest missionMapperRest,
+                             AuthenticatedUserResolver authenticatedUserResolver) {
         this.createMissionUseCase = createMissionUseCase;
         this.updateMissionUseCase = updateMissionUseCase;
         this.getAllMissionsUseCase = getAllMissionsUseCase;
         this.getMissionDetailUseCase = getMissionDetailUseCase;
         this.missionMapperRest = missionMapperRest;
+        this.authenticatedUserResolver = authenticatedUserResolver;
     }
 
     @GetMapping
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
+    @PreAuthorize("isAuthenticated()")
     public List<MissionListResponse> getMissions(Principal principal) {
-        String username = resolveUsername(principal);
-        return getAllMissionsUseCase.execute(username).stream()
-                .map(missionMapperRest::toList)
-                .toList();
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
-    public MissionDetailResponse getMissionById(@PathVariable Long id, Principal principal) {
-        String username = resolveUsername(principal);
-        return getMissionDetailUseCase.execute(username, id)
-                .map(missionMapperRest::toDetail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mission not found"));
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
-    public MissionDetailResponse createMission(@Valid @RequestBody MissionRequest request, Principal principal) {
-        String username = resolveUsername(principal);
+        String username = authenticatedUserResolver.resolve(principal);
         try {
-            Mission missionToCreate = missionMapperRest.toDomain(request);
-            Mission created = createMissionUseCase.execute(username, missionToCreate);
-            return missionMapperRest.toDetail(created, java.util.List.of(), BigDecimal.ZERO);
-        } catch (IllegalStateException ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (IllegalArgumentException ex) {
+            return getAllMissionsUseCase.execute(username).stream()
+                    .map(missionMapperRest::toList)
+                    .toList();
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public MissionDetailResponse getMissionById(@PathVariable Long id, Principal principal) {
+        String username = authenticatedUserResolver.resolve(principal);
+        try {
+            return getMissionDetailUseCase.execute(username, id)
+                    .map(missionMapperRest::toDetail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mission not found"));
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("isAuthenticated()")
+    public MissionDetailResponse createMission(@Valid @RequestBody MissionRequest request, Principal principal) {
+        String username = authenticatedUserResolver.resolve(principal);
+        try {
+            Mission missionToCreate = missionMapperRest.toDomain(request);
+            Mission created = createMissionUseCase.execute(username, missionToCreate);
+            return missionMapperRest.toDetail(created, java.util.List.of(), BigDecimal.ZERO);
+        } catch (ConflictException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (BadRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
+    @PreAuthorize("isAuthenticated()")
     public MissionDetailResponse updateMission(@PathVariable Long id, @Valid @RequestBody MissionRequest request, Principal principal) {
-        String username = resolveUsername(principal);
+        String username = authenticatedUserResolver.resolve(principal);
         try {
             Mission missionToUpdate = missionMapperRest.toDomain(id, request);
             return updateMissionUseCase.execute(username, id, missionToUpdate)
                     .map(updated -> missionMapperRest.toDetail(updated, java.util.List.of(), BigDecimal.ZERO))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mission not found"));
-        } catch (IllegalStateException ex) {
+        } catch (ConflictException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (IllegalArgumentException ex) {
+        } catch (BadRequestException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
-    }
-
-    private String resolveUsername(Principal principal) {
-        String username = principal != null ? principal.getName() : null;
-        if (username == null || username.isBlank()) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
-                username = authentication.getName();
-            }
-        }
-
-        if (username == null || username.isBlank() || "anonymousUser".equals(username)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-        }
-
-        return username;
     }
 }

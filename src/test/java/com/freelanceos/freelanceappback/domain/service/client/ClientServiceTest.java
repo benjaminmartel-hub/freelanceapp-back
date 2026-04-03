@@ -3,6 +3,7 @@ package com.freelanceos.freelanceappback.domain.service.client;
 import com.freelanceos.freelanceappback.domain.model.client.Client;
 import com.freelanceos.freelanceappback.domain.ports.out.ClientRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.ClientEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.ClientMapper;
@@ -78,7 +79,7 @@ class ClientServiceTest {
         when(clientRepository.existsByUserIdAndNameIgnoreCase(1L, "Maison Beldi")).thenReturn(true);
 
         assertThatThrownBy(() -> clientService.execute("demo", toCreate))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Client name already exists");
         verify(clientRepository, never()).save(any(ClientEntity.class));
     }
@@ -126,7 +127,7 @@ class ClientServiceTest {
         when(clientRepository.existsByUserIdAndNameIgnoreCaseAndIdNot(1L, "Maison Beldi", 1L)).thenReturn(true);
 
         assertThatThrownBy(() -> clientService.execute("demo", 1L, toUpdate))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Client name already exists");
         verify(clientRepository, never()).update(eq(1L), any(ClientEntity.class));
     }

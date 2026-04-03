@@ -1,5 +1,8 @@
 package com.freelanceos.freelanceappback.domain.service.mission;
 
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
 import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
@@ -51,7 +54,7 @@ public class MissionService implements CreateMissionUseCase,
     @Override
     public List<Mission> execute(String username) {
         Long userId = resolveUserId(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         return missionRepository.findByUserId(userId).stream()
                 .map(missionMapper::toDomain)
                 .toList();
@@ -60,7 +63,7 @@ public class MissionService implements CreateMissionUseCase,
     @Override
     public Optional<MissionDetail> execute(String username, Long id) {
         Long userId = resolveUserId(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         return missionRepository.findByIdAndUserId(id, userId)
                 .map(missionMapper::toDomain)
                 .map(mission -> {
@@ -87,7 +90,7 @@ public class MissionService implements CreateMissionUseCase,
     @Override
     public Optional<Mission> execute(String username, Long id, Mission missionToUpdate) {
         Long userId = resolveUserId(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         Optional<MissionEntity> existing = missionRepository.findByIdAndUserId(id, userId);
         if (existing.isEmpty()) {
             return Optional.empty();
@@ -97,7 +100,7 @@ public class MissionService implements CreateMissionUseCase,
         Mission normalized = normalizeMission(missionToUpdate, userId, client);
         validateNoOverlap(userId, normalized.startDate(), normalized.endDate(), id, normalized.status());
         MissionEntity updated = missionRepository.update(id, missionMapper.toEntity(normalized, existing.get().getUser(), client))
-                .orElseThrow(() -> new IllegalStateException("Mission not found"));
+                .orElseThrow(() -> new NotFoundException("Mission not found"));
         return Optional.of(missionMapper.toDomain(updated));
     }
 
@@ -110,7 +113,7 @@ public class MissionService implements CreateMissionUseCase,
 
     public List<Mission> findExpiringMissions(String username, int daysThreshold) {
         Long userId = resolveUserId(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         LocalDate today = LocalDate.now();
         LocalDate limit = today.plusDays(daysThreshold);
         return missionRepository.findExpiringMissions(userId, MissionStatus.ONGOING, limit).stream()
@@ -142,18 +145,18 @@ public class MissionService implements CreateMissionUseCase,
         }
         boolean overlap = missionRepository.existsOverlappingOngoingMission(userId, startDate, endDate, excludeId);
         if (overlap) {
-            throw new IllegalStateException("Overlapping ongoing mission detected");
+            throw new ConflictException("Overlapping ongoing mission detected");
         }
     }
 
     private UserEntity resolveUser(String username) {
         return userRepository.findByNameIgnoreCase(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     private Optional<Long> resolveUserId(String username) {
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username is required");
+            throw new BadRequestException("Username is required");
         }
 
         return userRepository.findByNameIgnoreCase(username)
@@ -162,9 +165,9 @@ public class MissionService implements CreateMissionUseCase,
 
     private ClientEntity resolveClient(Long userId, ClientSummary client) {
         if (client == null || client.id() == null) {
-            throw new IllegalArgumentException("Client is required");
+            throw new BadRequestException("Client is required");
         }
         return clientRepository.findByIdAndUserId(client.id(), userId)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+                .orElseThrow(() -> new NotFoundException("Client not found"));
     }
 }

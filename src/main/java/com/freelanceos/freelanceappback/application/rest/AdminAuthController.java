@@ -1,6 +1,8 @@
 package com.freelanceos.freelanceappback.application.rest;
 
 import com.freelanceos.freelanceappback.application.rest.dto.auth.ResetPasswordRequest;
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.ResetPasswordUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,10 +28,9 @@ public class AdminAuthController {
     public void resetPassword(@RequestBody ResetPasswordRequest request) {
         try {
             resetPasswordUseCase.execute(request.username(), request.newPassword());
-        } catch (IllegalArgumentException ex) {
-            if ("User not found".equals(ex.getMessage())) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
-            }
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }

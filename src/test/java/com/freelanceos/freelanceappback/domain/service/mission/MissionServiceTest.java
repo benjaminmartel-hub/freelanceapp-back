@@ -11,6 +11,7 @@ import com.freelanceos.freelanceappback.domain.ports.out.ClientRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.InvoiceRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.MissionRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.ClientEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
@@ -171,7 +172,7 @@ class MissionServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> missionService.execute("demo", toCreate))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Overlapping ongoing mission");
         verify(missionRepository, never()).save(any(MissionEntity.class));
     }
@@ -209,7 +210,7 @@ class MissionServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> missionService.execute("demo", 1L, toUpdate))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ConflictException.class);
         verify(missionRepository, never()).update(eq(1L), any(MissionEntity.class));
     }
 

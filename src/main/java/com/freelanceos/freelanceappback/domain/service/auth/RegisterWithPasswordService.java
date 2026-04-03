@@ -1,5 +1,6 @@
 package com.freelanceos.freelanceappback.domain.service.auth;
 
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.model.user.UserRole;
@@ -32,7 +33,7 @@ public class RegisterWithPasswordService implements RegisterWithPasswordUseCase 
     @Override
     public AuthAccount execute(String username, String password) {
         if (authAccountRepository.findByUsername(username).isPresent()) {
-            throw new IllegalStateException("Username already exists");
+            throw new ConflictException("Username already exists");
         }
 
         AuthAccount newAccount = new AuthAccount(null, username, passwordHasher.hash(password), AuthProvider.LOCAL, null);

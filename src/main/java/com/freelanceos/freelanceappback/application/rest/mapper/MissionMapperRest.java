@@ -91,7 +91,9 @@ public class MissionMapperRest {
                 missionDetail.status(),
                 client,
                 financials,
+                missionDetail.expectedDuration(),
                 period,
+                missionDetail.internalNotes(),
                 missionDetail.invoices().stream()
                         .map(this::toInvoice)
                         .toList()
@@ -117,7 +119,9 @@ public class MissionMapperRest {
                 mission.status(),
                 client,
                 financials,
+                mission.expectedDuration(),
                 period,
+                mission.internalNotes(),
                 invoices.stream()
                         .map(this::toInvoice)
                         .toList()

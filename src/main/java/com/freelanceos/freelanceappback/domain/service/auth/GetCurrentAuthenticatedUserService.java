@@ -1,5 +1,6 @@
 package com.freelanceos.freelanceappback.domain.service.auth;
 
+import com.freelanceos.freelanceappback.domain.exception.UnauthorizedException;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.GetCurrentAuthenticatedUserUseCase;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
@@ -21,6 +22,6 @@ public class GetCurrentAuthenticatedUserService implements GetCurrentAuthenticat
     public AuthAccount execute(String username) {
         return authAccountRepository.findByUsername(username)
                 .map(authAccountMapper::toDomain)
-                .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found"));
+                .orElseThrow(() -> new UnauthorizedException("Authenticated user not found"));
     }
 }

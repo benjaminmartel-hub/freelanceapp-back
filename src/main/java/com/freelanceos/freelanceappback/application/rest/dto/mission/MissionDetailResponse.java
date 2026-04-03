@@ -9,6 +9,8 @@ public record MissionDetailResponse(Long id,
                                     MissionStatus status,
                                     MissionClientResponse client,
                                     MissionFinancialsResponse financials,
+                                    Integer expectedDuration,
                                     MissionPeriodResponse period,
+                                    String internalNotes,
                                     List<MissionInvoiceResponse> invoices) {
 }

@@ -3,7 +3,6 @@ package com.freelanceos.freelanceappback.infrastructure.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -43,7 +42,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(new HttpStatusAccessDeniedHandler(HttpStatus.FORBIDDEN))
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/auth/register", "/auth/login", "/oauth2/**", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/h2-console/**", "/auth/register", "/auth/login", "/oauth2/**", "/login/oauth2/**","/error").permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -2,11 +2,13 @@ package com.freelanceos.freelanceappback.application.rest;
 
 import com.freelanceos.freelanceappback.application.rest.dto.dashboard.DashboardResponse;
 import com.freelanceos.freelanceappback.application.rest.mapper.DashboardMapperRest;
+import com.freelanceos.freelanceappback.application.rest.AuthenticatedUserResolver;
 import com.freelanceos.freelanceappback.domain.model.dashboard.ClientRevenueShare;
 import com.freelanceos.freelanceappback.domain.model.dashboard.Dashboard;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyStat;
 import com.freelanceos.freelanceappback.domain.model.dashboard.TaxEstimation;
 import com.freelanceos.freelanceappback.domain.ports.in.dashboard.GetDashboardUseCase;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.infrastructure.security.JwtTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,6 +39,11 @@ class DashboardControllerTest {
         DashboardMapperRest dashboardMapperRest() {
             return new DashboardMapperRest();
         }
+
+        @Bean
+        AuthenticatedUserResolver authenticatedUserResolver() {
+            return new AuthenticatedUserResolver();
+        }
     }
 
     @Autowired
@@ -48,6 +56,7 @@ class DashboardControllerTest {
     private JwtTokenService jwtTokenService;
 
     @Test
+    @WithMockUser(username = "demo")
     void meShouldReturnDashboardForAuthenticatedUser() throws Exception {
         Dashboard dashboard = new Dashboard(
                 BigDecimal.valueOf(1000),
@@ -76,8 +85,9 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "missing")
     void meShouldReturnNotFoundWhenUserMissing() throws Exception {
-        when(getDashboardUseCase.execute("missing")).thenThrow(new IllegalArgumentException("User not found"));
+        when(getDashboardUseCase.execute("missing")).thenThrow(new NotFoundException("User not found"));
 
         mockMvc.perform(get("/dashboard/me")
                         .principal(() -> "missing"))

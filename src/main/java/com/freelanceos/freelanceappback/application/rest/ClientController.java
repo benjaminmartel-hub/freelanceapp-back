@@ -3,6 +3,9 @@ package com.freelanceos.freelanceappback.application.rest;
 import com.freelanceos.freelanceappback.application.rest.dto.client.ClientRequest;
 import com.freelanceos.freelanceappback.application.rest.dto.client.ClientResponse;
 import com.freelanceos.freelanceappback.application.rest.mapper.ClientMapperRest;
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.ConflictException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.model.client.Client;
 import com.freelanceos.freelanceappback.domain.ports.in.client.CreateClientUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.client.DeleteClientUseCase;
@@ -12,8 +15,6 @@ import com.freelanceos.freelanceappback.domain.ports.in.client.UpdateClientUseCa
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,96 +38,105 @@ public class ClientController {
     private final UpdateClientUseCase updateClientUseCase;
     private final DeleteClientUseCase deleteClientUseCase;
     private final ClientMapperRest clientMapperRest;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     public ClientController(CreateClientUseCase createClientUseCase,
                             GetAllClientsUseCase getAllClientsUseCase,
                             GetClientByIdUseCase getClientByIdUseCase,
                             UpdateClientUseCase updateClientUseCase,
                             DeleteClientUseCase deleteClientUseCase,
-                            ClientMapperRest clientMapperRest) {
+                            ClientMapperRest clientMapperRest,
+                            AuthenticatedUserResolver authenticatedUserResolver) {
         this.createClientUseCase = createClientUseCase;
         this.getAllClientsUseCase = getAllClientsUseCase;
         this.getClientByIdUseCase = getClientByIdUseCase;
         this.updateClientUseCase = updateClientUseCase;
         this.deleteClientUseCase = deleteClientUseCase;
         this.clientMapperRest = clientMapperRest;
+        this.authenticatedUserResolver = authenticatedUserResolver;
     }
 
     @GetMapping
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
+    @PreAuthorize("isAuthenticated()")
     public List<ClientResponse> getClients(Principal principal) {
-        String username = resolveUsername(principal);
-        return getAllClientsUseCase.execute(username).stream()
-                .map(clientMapperRest::toResponse)
-                .toList();
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
-    public ClientResponse getClientById(@PathVariable Long id, Principal principal) {
-        String username = resolveUsername(principal);
-        return getClientByIdUseCase.execute(username, id)
-                .map(clientMapperRest::toResponse)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
-    public ClientResponse createClient(@Valid @RequestBody ClientRequest request, Principal principal) {
-        String username = resolveUsername(principal);
+        String username = authenticatedUserResolver.resolve(principal);
         try {
-            Client clientToCreate = clientMapperRest.toDomain(request);
-            return clientMapperRest.toResponse(createClientUseCase.execute(username, clientToCreate));
-        } catch (IllegalStateException ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (IllegalArgumentException ex) {
+            return getAllClientsUseCase.execute(username).stream()
+                    .map(clientMapperRest::toResponse)
+                    .toList();
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ClientResponse getClientById(@PathVariable Long id, Principal principal) {
+        String username = authenticatedUserResolver.resolve(principal);
+        try {
+            return getClientByIdUseCase.execute(username, id)
+                    .map(clientMapperRest::toResponse)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("isAuthenticated()")
+    public ClientResponse createClient(@Valid @RequestBody ClientRequest request, Principal principal) {
+        String username = authenticatedUserResolver.resolve(principal);
+        try {
+            Client clientToCreate = clientMapperRest.toDomain(request);
+            return clientMapperRest.toResponse(createClientUseCase.execute(username, clientToCreate));
+        } catch (ConflictException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (BadRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
+    @PreAuthorize("isAuthenticated()")
     public ClientResponse updateClient(@PathVariable Long id,
                                        @Valid @RequestBody ClientRequest request,
                                        Principal principal) {
-        String username = resolveUsername(principal);
+        String username = authenticatedUserResolver.resolve(principal);
         try {
             Client clientToUpdate = clientMapperRest.toDomain(id, request);
             return updateClientUseCase.execute(username, id, clientToUpdate)
                     .map(clientMapperRest::toResponse)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
-        } catch (IllegalStateException ex) {
+        } catch (ConflictException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (IllegalArgumentException ex) {
+        } catch (BadRequestException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("#principal != null && #principal.name == authentication.name")
+    @PreAuthorize("isAuthenticated()")
     public void deleteClient(@PathVariable Long id, Principal principal) {
-        String username = resolveUsername(principal);
-        boolean deleted = deleteClientUseCase.delete(username, id);
-        if (!deleted) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
-        }
-    }
-
-    private String resolveUsername(Principal principal) {
-        String username = principal != null ? principal.getName() : null;
-        if (username == null || username.isBlank()) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
-                username = authentication.getName();
+        String username = authenticatedUserResolver.resolve(principal);
+        try {
+            boolean deleted = deleteClientUseCase.delete(username, id);
+            if (!deleted) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
             }
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-
-        if (username == null || username.isBlank() || "anonymousUser".equals(username)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-        }
-
-        return username;
     }
 }
