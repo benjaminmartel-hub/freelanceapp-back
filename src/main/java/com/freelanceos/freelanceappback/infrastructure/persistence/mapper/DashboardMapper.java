@@ -36,7 +36,7 @@ public class DashboardMapper {
     public InvoiceSummary toDomain(InvoiceEntity invoiceEntity, LocalDate today) {
         return new InvoiceSummary(
                 invoiceEntity.getId(),
-                invoiceEntity.getClientName(),
+                invoiceEntity.getMission().getClient().getName(),
                 invoiceEntity.getTotalTtc(),
                 invoiceEntity.getDueDate(),
                 ChronoUnit.DAYS.between(invoiceEntity.getDueDate(), today)
@@ -47,7 +47,7 @@ public class DashboardMapper {
         return new MissionSummary(
                 missionEntity.getId(),
                 missionEntity.getTitle(),
-                missionEntity.getClientName(),
+                missionEntity.getClient().getName(),
                 missionEntity.getEndDate()
         );
     }

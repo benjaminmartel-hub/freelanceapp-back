@@ -1,7 +1,7 @@
 package com.freelanceos.freelanceappback.domain.ports.out;
 
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
-import com.freelanceos.freelanceappback.domain.model.dashboard.MissionStatus;
+import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.FiscalConfigEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.InvoiceEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;

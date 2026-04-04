@@ -10,6 +10,7 @@ import com.freelanceos.freelanceappback.domain.ports.in.user.GetAllUsersUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.GetUserByIdUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.user.UpdateUserUseCase;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
     private final CreateUserUseCase createUserUseCase;
     private final GetAllUsersUseCase getAllUsersUseCase;

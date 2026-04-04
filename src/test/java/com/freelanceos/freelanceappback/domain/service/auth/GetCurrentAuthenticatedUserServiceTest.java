@@ -3,6 +3,7 @@ package com.freelanceos.freelanceappback.domain.service.auth;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
+import com.freelanceos.freelanceappback.domain.exception.UnauthorizedException;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.AuthAccountMapper;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class GetCurrentAuthenticatedUserServiceTest {
         when(authAccountRepository.findByUsername("ghost")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> getCurrentAuthenticatedUserService.execute("ghost"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(UnauthorizedException.class)
                 .hasMessage("Authenticated user not found");
     }
 }

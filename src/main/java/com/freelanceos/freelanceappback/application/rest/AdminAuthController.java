@@ -1,8 +1,11 @@
 package com.freelanceos.freelanceappback.application.rest;
 
 import com.freelanceos.freelanceappback.application.rest.dto.auth.ResetPasswordRequest;
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.ResetPasswordUseCase;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,13 +24,13 @@ public class AdminAuthController {
 
     @PostMapping("/reset-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public void resetPassword(@RequestBody ResetPasswordRequest request) {
         try {
-            resetPasswordUseCase.execute(request.getUsername(), request.getNewPassword());
-        } catch (IllegalArgumentException ex) {
-            if ("User not found".equals(ex.getMessage())) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
-            }
+            resetPasswordUseCase.execute(request.username(), request.newPassword());
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }

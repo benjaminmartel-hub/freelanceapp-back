@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.freelanceos</groupId>
     <artifactId>freelanceapp-back</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <name>freelanceapp-back</name>
     <description>freelanceapp-back</description>
     <url/>
@@ -55,6 +55,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

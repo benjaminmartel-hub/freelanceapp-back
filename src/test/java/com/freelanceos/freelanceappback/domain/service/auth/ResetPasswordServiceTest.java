@@ -3,6 +3,8 @@ package com.freelanceos.freelanceappback.domain.service.auth;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthProvider;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.security.PasswordHasher;
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
+import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.AuthAccountEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +51,7 @@ class ResetPasswordServiceTest {
     @Test
     void executeShouldThrowWhenPasswordTooShort() {
         assertThatThrownBy(() -> resetPasswordService.execute("demo", "short"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("Password must be at least 8 characters");
 
         verifyNoInteractions(authAccountRepository, passwordHasher);
@@ -60,7 +62,7 @@ class ResetPasswordServiceTest {
         when(authAccountRepository.findByUsername("missing")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> resetPasswordService.execute("missing", "newpassword"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("User not found");
 
         verify(authAccountRepository).findByUsername("missing");
@@ -74,7 +76,7 @@ class ResetPasswordServiceTest {
         when(authAccountRepository.findByUsername("oauth")).thenReturn(Optional.of(account));
 
         assertThatThrownBy(() -> resetPasswordService.execute("oauth", "newpassword"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("User has no local credentials");
 
         verify(authAccountRepository).findByUsername("oauth");

@@ -1,5 +1,6 @@
 package com.freelanceos.freelanceappback.domain.service.auth;
 
+import com.freelanceos.freelanceappback.domain.exception.UnauthorizedException;
 import com.freelanceos.freelanceappback.domain.model.auth.AuthAccount;
 import com.freelanceos.freelanceappback.domain.ports.in.auth.LoginWithPasswordUseCase;
 import com.freelanceos.freelanceappback.domain.ports.out.AuthAccountRepository;
@@ -25,11 +26,11 @@ public class LoginWithPasswordService implements LoginWithPasswordUseCase {
     public AuthAccount execute(String username, String password) {
         boolean authenticated = credentialsAuthenticator.authenticate(username, password);
         if (!authenticated) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
 
         return authAccountRepository.findByUsername(username)
                 .map(authAccountMapper::toDomain)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
     }
 }

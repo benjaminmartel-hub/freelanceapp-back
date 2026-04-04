@@ -3,6 +3,7 @@ package com.freelanceos.freelanceappback.infrastructure.persistence.entity;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -10,13 +11,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invoices")
+@EntityListeners(AuditingEntityListener.class)
 public class InvoiceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,35 +37,56 @@ public class InvoiceEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "client_name", nullable = false)
-    private String clientName;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "mission_id", nullable = false)
+    private MissionEntity mission;
 
+    @NotBlank
+    @Column(name = "invoice_number", nullable = false)
+    private String number;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private InvoiceStatus status;
 
+    @NotNull
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
+    @NotNull
+    @Positive
     @Column(name = "total_ht", nullable = false, precision = 19, scale = 2)
     private BigDecimal totalHt;
 
+    @NotNull
+    @Positive
     @Column(name = "total_ttc", nullable = false, precision = 19, scale = 2)
     private BigDecimal totalTtc;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     public InvoiceEntity() {
     }
 
     public InvoiceEntity(Long id,
                          UserEntity user,
-                         String clientName,
+                         MissionEntity mission,
+                         String number,
                          InvoiceStatus status,
                          LocalDate dueDate,
                          BigDecimal totalHt,
                          BigDecimal totalTtc) {
         this.id = id;
         this.user = user;
-        this.clientName = clientName;
+        this.mission = mission;
+        this.number = number;
         this.status = status;
         this.dueDate = dueDate;
         this.totalHt = totalHt;
@@ -77,12 +109,20 @@ public class InvoiceEntity {
         this.user = user;
     }
 
-    public String getClientName() {
-        return clientName;
+    public MissionEntity getMission() {
+        return mission;
     }
 
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
+    public void setMission(MissionEntity mission) {
+        this.mission = mission;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public InvoiceStatus getStatus() {
@@ -115,5 +155,37 @@ public class InvoiceEntity {
 
     public void setTotalTtc(BigDecimal totalTtc) {
         this.totalTtc = totalTtc;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    @PrePersist
+    void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = now;
+        }
+        if (updatedAt == null) {
+            updatedAt = createdAt;
+        }
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

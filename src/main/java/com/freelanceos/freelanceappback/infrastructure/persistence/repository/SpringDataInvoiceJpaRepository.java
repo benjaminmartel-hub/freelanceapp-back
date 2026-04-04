@@ -3,6 +3,7 @@ package com.freelanceos.freelanceappback.infrastructure.persistence.repository;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.InvoiceEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.ClientRevenueAggregateProjection;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MissionInvoiceSummaryProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MonthlyRevenueAggregateProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -53,14 +54,14 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
                                                                       @Param("endDateExclusive") LocalDate endDateExclusive);
 
     @Query("""
-            select i.clientName as clientName,
+            select i.mission.client.name as clientName,
                    sum(i.totalHt) as amount
             from InvoiceEntity i
             where i.user.id = :userId
               and i.status in :statuses
               and i.dueDate >= :startDate
               and i.dueDate < :endDateExclusive
-            group by i.clientName
+            group by i.mission.client.name
             order by sum(i.totalHt) desc
             """)
     List<ClientRevenueAggregateProjection> findClientRevenueDistribution(
@@ -80,5 +81,27 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
     List<InvoiceEntity> findOverdueInvoices(@Param("userId") Long userId,
                                             @Param("status") InvoiceStatus status,
                                             @Param("today") LocalDate today);
+
+    @Query("""
+            select i.id as id,
+                   i.number as number,
+                   i.totalHt as amount,
+                   i.status as status
+            from InvoiceEntity i
+            where i.user.id = :userId
+              and i.mission.id = :missionId
+            order by i.dueDate desc
+            """)
+    List<MissionInvoiceSummaryProjection> findMissionInvoiceSummaries(@Param("userId") Long userId,
+                                                                       @Param("missionId") Long missionId);
+
+    @Query("""
+            select coalesce(sum(i.totalHt), 0)
+            from InvoiceEntity i
+            where i.user.id = :userId
+              and i.mission.id = :missionId
+            """)
+    BigDecimal sumTotalHtByUserIdAndMissionId(@Param("userId") Long userId,
+                                              @Param("missionId") Long missionId);
 
 }

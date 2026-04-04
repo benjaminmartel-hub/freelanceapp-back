@@ -1,11 +1,12 @@
 package com.freelanceos.freelanceappback.domain.service.dashboard;
 
+import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
 import com.freelanceos.freelanceappback.domain.model.dashboard.Dashboard;
 import com.freelanceos.freelanceappback.domain.model.dashboard.DeclarationPeriod;
 import com.freelanceos.freelanceappback.domain.model.dashboard.FiscalConfigSettings;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceSummary;
-import com.freelanceos.freelanceappback.domain.model.dashboard.MissionStatus;
+import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MissionSummary;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyRevenueAggregate;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyStat;
@@ -14,7 +15,9 @@ import com.freelanceos.freelanceappback.domain.model.dashboard.TaxEstimation;
 import com.freelanceos.freelanceappback.domain.ports.in.dashboard.GetDashboardUseCase;
 import com.freelanceos.freelanceappback.domain.ports.out.DashboardMetricsRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;
+import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.DashboardMapper;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -71,7 +74,7 @@ public class GetDashboardService implements GetDashboardUseCase {
                 .map(invoiceEntity -> dashboardMapper.toDomain(invoiceEntity, today))
                 .toList();
         List<MissionSummary> expiringMissions = safeList(dashboardMetricsRepository.findExpiringMissions(
-                userId.get(), MissionStatus.ACTIVE, today.plusDays(15))).stream()
+                userId.get(), MissionStatus.ONGOING, today.plusDays(15))).stream()
                 .map(dashboardMapper::toDomain)
                 .toList();
         TaxEstimation taxEstimation = buildTaxEstimation(userId.get(), today);
@@ -90,11 +93,11 @@ public class GetDashboardService implements GetDashboardUseCase {
 
     private java.util.Optional<Long> resolveUserId(String username) {
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username is required");
+            throw new BadRequestException("Username is required");
         }
 
         return userRepository.findByNameIgnoreCase(username)
-                .map(user -> user.getId());
+                .map(UserEntity::getId);
     }
 
     private List<MonthlyStat> buildRevenueHistory(Long userId, LocalDate startOfCurrentMonth) {
@@ -136,6 +139,10 @@ public class GetDashboardService implements GetDashboardUseCase {
                 ))
                 .toList();
 
+        return getTopFiveClient(aggregates);
+    }
+
+    private static @NonNull List<ClientRevenueShare> getTopFiveClient(List<ClientRevenueShare> aggregates) {
         List<ClientRevenueShare> topFive = new java.util.ArrayList<>();
         BigDecimal othersTotal = BigDecimal.ZERO;
         for (int i = 0; i < aggregates.size(); i++) {
@@ -150,7 +157,6 @@ public class GetDashboardService implements GetDashboardUseCase {
         if (othersTotal.compareTo(BigDecimal.ZERO) > 0) {
             topFive.add(new ClientRevenueShare("Autres", othersTotal));
         }
-
         return topFive;
     }
 
