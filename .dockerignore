@@ -1,0 +1,11 @@
+.git
+.github
+.idea
+target
+
+.env
+.env.*
+!.env.example
+
+*.log
+h2-debug.*.log
