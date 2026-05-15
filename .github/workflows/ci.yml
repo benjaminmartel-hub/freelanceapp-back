@@ -18,6 +18,8 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
       - name: Run tests
         run: ./mvnw -q verify
 
@@ -34,6 +36,8 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
       - name: Build
         run: ./mvnw -q package
       - name: Notify Render
