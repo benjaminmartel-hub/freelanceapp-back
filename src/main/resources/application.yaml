@@ -10,5 +10,7 @@ app:
     jwt:
       secret: ${JWT_SECRET:change-this-secret-key-for-jwt-signing-32-bytes-min}
       expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
+    cors:
+      allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:4200,https://*.vercel.app}
     oauth2:
       success-redirect-uri: ${OAUTH2_SUCCESS_REDIRECT_URI:http://localhost:4200/auth/login}
