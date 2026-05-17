@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(new HttpStatusAccessDeniedHandler(HttpStatus.FORBIDDEN))
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/auth/register", "/auth/login", "/oauth2/**", "/login/oauth2/**","/error").permitAll()
+                        .requestMatchers("/actuator/health", "/h2-console/**", "/auth/register", "/auth/login", "/oauth2/**", "/login/oauth2/**", "/error").permitAll()
                         .anyRequest().authenticated()
                 );
 
