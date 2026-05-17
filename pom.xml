@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.freelanceos</groupId>
     <artifactId>freelanceapp-back</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
     <name>freelanceapp-back</name>
     <description>freelanceapp-back</description>
     <url/>
@@ -47,6 +47,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
