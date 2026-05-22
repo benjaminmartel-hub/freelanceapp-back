@@ -4,8 +4,8 @@ import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionRequ
 import com.freelanceos.freelanceappback.application.rest.mapper.MissionMapperRest;
 import com.freelanceos.freelanceappback.application.rest.AuthenticatedUserResolver;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
-import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceSummaryForMission;
 import com.freelanceos.freelanceappback.domain.model.mission.BillingType;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
@@ -107,8 +107,8 @@ class MissionControllerTest {
                 BigDecimal.valueOf(600), 10, BigDecimal.valueOf(6000), BigDecimal.valueOf(1500), "EUR",
                 LocalDate.now().minusDays(2), LocalDate.now().plusDays(8),
                 MissionStatus.ONGOING, BillingType.TJM, "Notes", List.of(
-                        new MissionInvoice(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
-                        new MissionInvoice(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
+                        new InvoiceSummaryForMission(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
+                        new InvoiceSummaryForMission(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
                 ));
 
         when(getMissionDetailUseCase.execute("demo", 1L)).thenReturn(Optional.of(detail));

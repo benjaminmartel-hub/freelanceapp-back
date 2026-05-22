@@ -216,13 +216,13 @@ WHERE u.email = 'demo@freelanceos.com'
   );
 
 -- Invoices for dashboard metrics and monthly history
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Maison Beldi'),
-       'INV-2026-001', 'PAID', DATEADD('DAY', -5, CURRENT_DATE), 2800.00, 3360.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-001', 'PAID', DATEADD('DAY', -5, CURRENT_DATE), DATEADD('DAY', -5, CURRENT_DATE), 2800.00, 0.2000, 3360.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -231,13 +231,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-001'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Atelier Nova'),
-       'INV-2026-002', 'SENT', DATEADD('DAY', 7, CURRENT_DATE), 1600.00, 1920.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-002', 'SENT', DATEADD('DAY', 7, CURRENT_DATE), DATEADD('DAY', 7, CURRENT_DATE), 1600.00, 0.2000, 1920.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -246,13 +246,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-002'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Blue Orbit'),
-       'INV-2026-003', 'SENT', DATEADD('DAY', -12, CURRENT_DATE), 2400.00, 2880.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-003', 'OVERDUE', DATEADD('DAY', -12, CURRENT_DATE), DATEADD('DAY', -12, CURRENT_DATE), 2400.00, 0.2000, 2880.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -261,13 +261,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-003'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Studio Atlas'),
-       'INV-2026-004', 'PAID', DATEADD('MONTH', -1, CURRENT_DATE), 1900.00, 2280.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-004', 'PAID', DATEADD('MONTH', -1, CURRENT_DATE), DATEADD('MONTH', -1, CURRENT_DATE), 1900.00, 0.2000, 2280.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -276,13 +276,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-004'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Cobalt Labs'),
-       'INV-2026-005', 'PAID', DATEADD('MONTH', -2, CURRENT_DATE), 2250.00, 2700.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-005', 'PAID', DATEADD('MONTH', -2, CURRENT_DATE), DATEADD('MONTH', -2, CURRENT_DATE), 2250.00, 0.2000, 2700.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -291,13 +291,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-005'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Pixel Harbor'),
-       'INV-2026-006', 'PAID', DATEADD('MONTH', -4, CURRENT_DATE), 3100.00, 3720.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-006', 'PAID', DATEADD('MONTH', -4, CURRENT_DATE), DATEADD('MONTH', -4, CURRENT_DATE), 3100.00, 0.2000, 3720.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -306,13 +306,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-006'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Nordic Scale'),
-       'INV-2026-007', 'PAID', DATEADD('MONTH', -7, CURRENT_DATE), 1700.00, 2040.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-007', 'PAID', DATEADD('MONTH', -7, CURRENT_DATE), DATEADD('MONTH', -7, CURRENT_DATE), 1700.00, 0.2000, 2040.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (
@@ -321,13 +321,13 @@ WHERE u.email = 'demo@freelanceos.com'
         AND i.invoice_number = 'INV-2026-007'
   );
 
-INSERT INTO invoices (user_id, mission_id, invoice_number, status, due_date, total_ht, total_ttc, created_at, updated_at)
+INSERT INTO invoices (user_id, mission_id, invoice_number, status, issue_date, due_date, total_ht, vat_rate, total_ttc, created_at, updated_at)
 SELECT u.id,
        (SELECT MIN(m.id)
         FROM missions m
         JOIN clients c ON c.id = m.client_id
         WHERE m.user_id = u.id AND c.name = 'Nova Factory'),
-       'INV-2026-008', 'DRAFT', DATEADD('DAY', 20, CURRENT_DATE), 1300.00, 1560.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       'INV-2026-008', 'DRAFT', DATEADD('DAY', 20, CURRENT_DATE), DATEADD('DAY', 20, CURRENT_DATE), 1300.00, 0.2000, 1560.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE u.email = 'demo@freelanceos.com'
   AND NOT EXISTS (

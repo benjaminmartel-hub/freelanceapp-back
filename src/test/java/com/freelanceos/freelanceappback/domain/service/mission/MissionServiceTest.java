@@ -2,8 +2,8 @@ package com.freelanceos.freelanceappback.domain.service.mission;
 
 import com.freelanceos.freelanceappback.domain.model.mission.BillingType;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
-import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceSummaryForMission;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
@@ -16,7 +16,7 @@ import com.freelanceos.freelanceappback.infrastructure.persistence.entity.Client
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.MissionMapper;
-import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MissionInvoiceSummaryProjection;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.InvoiceSummaryForMissionProjection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -85,14 +85,14 @@ class MissionServiceTest {
         when(userRepository.findByNameIgnoreCase("demo")).thenReturn(Optional.of(user));
         when(missionRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(entity));
         when(missionMapper.toDomain(entity)).thenReturn(mission);
-        when(invoiceRepository.findSummariesByUserIdAndMissionId(1L, 1L)).thenReturn(List.of(
+        when(invoiceRepository.findInvoiceSummariesForMission(1L, 1L)).thenReturn(List.of(
                 buildProjection(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
                 buildProjection(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
         ));
-        when(missionMapper.toDomain(any(MissionInvoiceSummaryProjection.class)))
+        when(missionMapper.toInvoiceSummaryForMission(any(InvoiceSummaryForMissionProjection.class)))
                 .thenAnswer(invocation -> {
-                    MissionInvoiceSummaryProjection projection = invocation.getArgument(0);
-                    return new MissionInvoice(
+                    InvoiceSummaryForMissionProjection projection = invocation.getArgument(0);
+                    return new InvoiceSummaryForMission(
                             projection.getId(),
                             projection.getNumber(),
                             projection.getAmount(),
@@ -117,15 +117,15 @@ class MissionServiceTest {
                         mission.billingType(),
                         mission.internalNotes(),
                         List.of(
-                                new MissionInvoice(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
-                                new MissionInvoice(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
+                                new InvoiceSummaryForMission(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
+                                new InvoiceSummaryForMission(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
                         )
                 ));
 
         Optional<MissionDetail> result = missionService.execute("demo", 1L);
 
         assertThat(result).isPresent();
-        assertThat(result.get().invoices()).extracting(MissionInvoice::id).containsExactly(10L, 11L);
+        assertThat(result.get().invoices()).extracting(InvoiceSummaryForMission::id).containsExactly(10L, 11L);
         assertThat(result.get().totalInvoiced()).isEqualByComparingTo(BigDecimal.valueOf(1500));
     }
 
@@ -287,11 +287,11 @@ class MissionServiceTest {
                 });
     }
 
-    private MissionInvoiceSummaryProjection buildProjection(Long id,
+    private InvoiceSummaryForMissionProjection buildProjection(Long id,
                                                             String number,
                                                             BigDecimal amount,
                                                             InvoiceStatus status) {
-        return new MissionInvoiceSummaryProjection() {
+        return new InvoiceSummaryForMissionProjection() {
             @Override
             public Long getId() {
                 return id;

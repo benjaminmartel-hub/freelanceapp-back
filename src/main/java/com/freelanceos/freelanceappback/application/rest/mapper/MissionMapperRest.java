@@ -3,12 +3,12 @@ package com.freelanceos.freelanceappback.application.rest.mapper;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionDetailResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionFinancialsResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionClientResponse;
-import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionInvoiceResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.mission.InvoiceSummaryForMissionResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionListResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionPeriodResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionRequest;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
-import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceSummaryForMission;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
 import org.springframework.stereotype.Component;
@@ -100,7 +100,7 @@ public class MissionMapperRest {
         );
     }
 
-    public MissionDetailResponse toDetail(Mission mission, List<MissionInvoice> invoices, BigDecimal totalInvoiced) {
+    public MissionDetailResponse toDetail(Mission mission, List<InvoiceSummaryForMission> invoices, BigDecimal totalInvoiced) {
         MissionClientResponse client = new MissionClientResponse(mission.client().id(), mission.client().name());
         MissionFinancialsResponse financials = new MissionFinancialsResponse(
                 mission.dailyRate(),
@@ -128,8 +128,8 @@ public class MissionMapperRest {
         );
     }
 
-    private MissionInvoiceResponse toInvoice(MissionInvoice invoice) {
-        return new MissionInvoiceResponse(
+    private InvoiceSummaryForMissionResponse toInvoice(InvoiceSummaryForMission invoice) {
+        return new InvoiceSummaryForMissionResponse(
                 invoice.id(),
                 invoice.number(),
                 invoice.amount(),

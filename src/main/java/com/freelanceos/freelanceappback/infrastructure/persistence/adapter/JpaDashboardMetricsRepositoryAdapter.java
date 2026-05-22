@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.adapter;
 
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.ports.out.DashboardMetricsRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.FiscalConfigEntity;
@@ -63,7 +63,7 @@ public class JpaDashboardMetricsRepositoryAdapter implements DashboardMetricsRep
 
     @Override
     public List<InvoiceEntity> findOverdueInvoices(Long userId, LocalDate today) {
-        return invoiceJpaRepository.findOverdueInvoices(userId, InvoiceStatus.SENT, today);
+        return invoiceJpaRepository.findOverdueInvoices(userId, InvoiceStatus.OVERDUE, today);
     }
 
     @Override

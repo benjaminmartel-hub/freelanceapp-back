@@ -1,10 +1,10 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.projection;
 
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 
 import java.math.BigDecimal;
 
-public interface MissionInvoiceSummaryProjection {
+public interface InvoiceSummaryForMissionProjection {
     Long getId();
 
     String getNumber();

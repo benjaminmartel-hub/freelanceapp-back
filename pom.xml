@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.freelanceos</groupId>
     <artifactId>freelanceapp-back</artifactId>
-    <version>0.4.1</version>
+    <version>0.5.0-SNAPSHOT</version>
     <name>freelanceapp-back</name>
     <description>freelanceapp-back</description>
     <url/>

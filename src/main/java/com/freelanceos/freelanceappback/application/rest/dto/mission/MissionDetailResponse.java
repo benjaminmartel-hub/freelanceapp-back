@@ -12,5 +12,5 @@ public record MissionDetailResponse(Long id,
                                     Integer expectedDuration,
                                     MissionPeriodResponse period,
                                     String internalNotes,
-                                    List<MissionInvoiceResponse> invoices) {
+                                    List<InvoiceSummaryForMissionResponse> invoices) {
 }

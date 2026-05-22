@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.adapter;
 
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.mission.BillingType;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.ports.out.DashboardMetricsRepository;

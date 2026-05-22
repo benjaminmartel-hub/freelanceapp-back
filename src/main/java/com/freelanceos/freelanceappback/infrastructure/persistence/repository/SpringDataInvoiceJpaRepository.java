@@ -1,9 +1,9 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.repository;
 
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.InvoiceEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.ClientRevenueAggregateProjection;
-import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MissionInvoiceSummaryProjection;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.InvoiceSummaryForMissionProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MonthlyRevenueAggregateProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +12,29 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEntity, Long> {
+    @Query("""
+            select i
+            from InvoiceEntity i
+            join fetch i.mission m
+            join fetch m.client
+            where i.user.id = :userId
+            order by i.issueDate desc, i.id desc
+            """)
+    List<InvoiceEntity> findByUserIdWithMissionAndClient(@Param("userId") Long userId);
+
+    @Query("""
+            select i
+            from InvoiceEntity i
+            join fetch i.mission m
+            join fetch m.client
+            where i.id = :id
+              and i.user.id = :userId
+            """)
+    Optional<InvoiceEntity> findByIdAndUserIdWithMissionAndClient(@Param("id") Long id, @Param("userId") Long userId);
+
     @Query("""
             select sum(i.totalHt)
             from InvoiceEntity i
@@ -28,7 +49,7 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
                                                        @Param("endDateExclusive") LocalDate endDateExclusive);
 
     @Query("""
-            select sum(i.totalHt)
+            select coalesce(sum(i.totalHt), 0)
             from InvoiceEntity i
             where i.user.id = :userId
               and i.status = :status
@@ -92,8 +113,8 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
               and i.mission.id = :missionId
             order by i.dueDate desc
             """)
-    List<MissionInvoiceSummaryProjection> findMissionInvoiceSummaries(@Param("userId") Long userId,
-                                                                       @Param("missionId") Long missionId);
+    List<InvoiceSummaryForMissionProjection> findInvoiceSummariesForMission(@Param("userId") Long userId,
+                                                                            @Param("missionId") Long missionId);
 
     @Query("""
             select coalesce(sum(i.totalHt), 0)
