@@ -46,9 +46,9 @@ class JpaInvoiceRepositoryAdapterTest {
                 MissionStatus.ONGOING, BillingType.TJM, "Notes", "EUR");
         entityManager.persist(mission);
         entityManager.flush();
-        InvoiceEntity invoice1 = new InvoiceEntity(null, user, mission, "INV-001", InvoiceStatus.SENT,
+        InvoiceEntity invoice1 = new InvoiceEntity(null, user, mission, "FAC-2026-0001", InvoiceStatus.SENT,
                 LocalDate.now().plusDays(5), BigDecimal.valueOf(1000), BigDecimal.valueOf(1200));
-        InvoiceEntity invoice2 = new InvoiceEntity(null, user, mission, "INV-002", InvoiceStatus.PAID,
+        InvoiceEntity invoice2 = new InvoiceEntity(null, user, mission, "FAC-2026-0002", InvoiceStatus.PAID,
                 LocalDate.now().minusDays(5), BigDecimal.valueOf(2000), BigDecimal.valueOf(2400));
         entityManager.persist(invoice1);
         entityManager.persist(invoice2);
@@ -109,5 +109,36 @@ class JpaInvoiceRepositoryAdapterTest {
         assertThat(invoiceRepository.findByIdAndUserId(invoice.getId(), user.getId())).isPresent();
         assertThat(invoiceRepository.sumTotalHtByUserIdAndStatus(user.getId(), InvoiceStatus.SENT))
                 .isEqualByComparingTo(BigDecimal.valueOf(1000));
+    }
+
+    @Test
+    void findHighestInvoiceNumberForYearShouldReturnHighestFacNumberOnly() {
+        UserEntity user = new UserEntity(null, "demo", "demo@freelanceos.com");
+        entityManager.persist(user);
+        ClientEntity client = new ClientEntity(null, user, "Maison Beldi", "contact@maisonbeldi.com");
+        entityManager.persist(client);
+        MissionEntity mission = new MissionEntity(null, user, client, "Audit",
+                BigDecimal.valueOf(600), 10, BigDecimal.valueOf(6000),
+                LocalDate.now().minusDays(5), LocalDate.now().plusDays(5),
+                MissionStatus.ONGOING, BillingType.TJM, "Notes", "EUR");
+        entityManager.persist(mission);
+        entityManager.flush();
+
+        entityManager.persist(new InvoiceEntity(null, user, mission, "FAC-2026-0002", InvoiceStatus.SENT,
+                LocalDate.of(2026, 1, 10), LocalDate.of(2026, 1, 25),
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(20), BigDecimal.valueOf(1200)));
+        entityManager.persist(new InvoiceEntity(null, user, mission, "INV-2026-999", InvoiceStatus.SENT,
+                LocalDate.of(2026, 1, 11), LocalDate.of(2026, 1, 26),
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(20), BigDecimal.valueOf(1200)));
+        entityManager.persist(new InvoiceEntity(null, user, mission, "FAC-2026-0009", InvoiceStatus.SENT,
+                LocalDate.of(2026, 1, 12), LocalDate.of(2026, 1, 27),
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(20), BigDecimal.valueOf(1200)));
+        entityManager.persist(new InvoiceEntity(null, user, mission, "FAC-2025-0010", InvoiceStatus.SENT,
+                LocalDate.of(2025, 1, 12), LocalDate.of(2025, 1, 27),
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(20), BigDecimal.valueOf(1200)));
+        entityManager.flush();
+
+        assertThat(invoiceRepository.findHighestInvoiceNumberForYear(2026))
+                .contains("FAC-2026-0009");
     }
 }

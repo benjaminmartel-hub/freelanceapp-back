@@ -5,7 +5,10 @@ import com.freelanceos.freelanceappback.infrastructure.persistence.entity.Invoic
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.ClientRevenueAggregateProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.InvoiceSummaryForMissionProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MonthlyRevenueAggregateProjection;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -35,12 +38,14 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
             """)
     Optional<InvoiceEntity> findByIdAndUserIdWithMissionAndClient(@Param("id") Long id, @Param("userId") Long userId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            select count(i)
+            select i
             from InvoiceEntity i
-            where year(i.issueDate) = :year
+            where i.number like :prefix
+            order by i.number desc
             """)
-    long countByIssueYear(@Param("year") int year);
+    List<InvoiceEntity> findHighestInvoiceNumberWithPrefix(@Param("prefix") String prefix, Pageable pageable);
 
     @Query("""
             select sum(i.totalHt)

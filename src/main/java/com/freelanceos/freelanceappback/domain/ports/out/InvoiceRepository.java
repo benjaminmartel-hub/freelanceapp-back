@@ -15,7 +15,7 @@ public interface InvoiceRepository {
 
     InvoiceEntity save(InvoiceEntity invoice);
 
-    long countByIssueYear(int year);
+    Optional<String> findHighestInvoiceNumberForYear(int year);
 
     List<InvoiceSummaryForMissionProjection> findInvoiceSummariesForMission(Long userId, Long missionId);
 

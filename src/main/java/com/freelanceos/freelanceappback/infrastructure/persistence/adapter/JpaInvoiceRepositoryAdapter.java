@@ -5,6 +5,7 @@ import com.freelanceos.freelanceappback.domain.ports.out.InvoiceRepository;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.InvoiceEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.projection.InvoiceSummaryForMissionProjection;
 import com.freelanceos.freelanceappback.infrastructure.persistence.repository.SpringDataInvoiceJpaRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -35,8 +36,11 @@ public class JpaInvoiceRepositoryAdapter implements InvoiceRepository {
     }
 
     @Override
-    public long countByIssueYear(int year) {
-        return invoiceJpaRepository.countByIssueYear(year);
+    public Optional<String> findHighestInvoiceNumberForYear(int year) {
+        String prefix = "FAC-%d-".formatted(year);
+        return invoiceJpaRepository.findHighestInvoiceNumberWithPrefix(prefix + "%", PageRequest.of(0, 1)).stream()
+                .map(InvoiceEntity::getNumber)
+                .findFirst();
     }
 
     @Override

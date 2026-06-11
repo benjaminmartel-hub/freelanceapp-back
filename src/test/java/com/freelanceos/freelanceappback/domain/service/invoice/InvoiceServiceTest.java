@@ -87,11 +87,10 @@ class InvoiceServiceTest {
         Invoice invoiceToCreate = buildInvoiceToPersist(null, InvoiceStatus.DRAFT);
         InvoiceEntity saved = buildInvoiceEntity(user);
         saved.setStatus(InvoiceStatus.DRAFT);
-        saved.setNumber("FAC-2026-0003");
 
         when(userRepository.findByNameIgnoreCase("demo")).thenReturn(Optional.of(user));
         when(missionRepository.findByIdAndUserId(10L, 1L)).thenReturn(Optional.of(saved.getMission()));
-        when(invoiceRepository.countByIssueYear(2026)).thenReturn(2L);
+        when(invoiceRepository.findHighestInvoiceNumberForYear(2026)).thenReturn(Optional.of("FAC-2026-0008"));
         when(invoiceRepository.save(any(InvoiceEntity.class))).thenAnswer(invocation -> {
             InvoiceEntity invoice = invocation.getArgument(0);
             invoice.setId(99L);
@@ -103,7 +102,7 @@ class InvoiceServiceTest {
         Invoice created = service.execute("demo", invoiceToCreate);
 
         assertThat(created.id()).isEqualTo(99L);
-        assertThat(created.number()).isEqualTo("FAC-2026-0003");
+        assertThat(created.number()).isEqualTo("FAC-2026-0009");
         assertThat(created.status()).isEqualTo(InvoiceStatus.DRAFT);
         assertThat(created.vatRate()).isEqualByComparingTo(BigDecimal.valueOf(20));
         assertThat(created.totalTtc()).isEqualByComparingTo(BigDecimal.valueOf(1200).setScale(2));
@@ -111,6 +110,30 @@ class InvoiceServiceTest {
         ArgumentCaptor<InvoiceEntity> invoiceCaptor = ArgumentCaptor.forClass(InvoiceEntity.class);
         verify(invoiceRepository).save(invoiceCaptor.capture());
         assertThat(invoiceCaptor.getValue().getVatRate()).isEqualByComparingTo(BigDecimal.valueOf(20));
+        assertThat(invoiceCaptor.getValue().getNumber()).isEqualTo("FAC-2026-0009");
+    }
+
+    @Test
+    void createShouldStartInvoiceNumberAtOneWhenYearHasNoInvoice() {
+        UserEntity user = new UserEntity(1L, "demo", "demo@example.com");
+        Invoice invoiceToCreate = buildInvoiceToPersist(null, InvoiceStatus.DRAFT);
+        InvoiceEntity saved = buildInvoiceEntity(user);
+        saved.setStatus(InvoiceStatus.DRAFT);
+
+        when(userRepository.findByNameIgnoreCase("demo")).thenReturn(Optional.of(user));
+        when(missionRepository.findByIdAndUserId(10L, 1L)).thenReturn(Optional.of(saved.getMission()));
+        when(invoiceRepository.findHighestInvoiceNumberForYear(2026)).thenReturn(Optional.empty());
+        when(invoiceRepository.save(any(InvoiceEntity.class))).thenAnswer(invocation -> {
+            InvoiceEntity invoice = invocation.getArgument(0);
+            invoice.setId(99L);
+            return invoice;
+        });
+
+        InvoiceService service = new InvoiceService(invoiceRepository, missionRepository, userRepository, new InvoiceMapper());
+
+        Invoice created = service.execute("demo", invoiceToCreate);
+
+        assertThat(created.number()).isEqualTo("FAC-2026-0001");
     }
 
     @Test

@@ -17,12 +17,15 @@ import com.freelanceos.freelanceappback.infrastructure.persistence.entity.Missio
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.mapper.InvoiceMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class InvoiceService implements GetAllInvoicesUseCase,
@@ -36,6 +39,7 @@ public class InvoiceService implements GetAllInvoicesUseCase,
     private final InvoiceMapper invoiceMapper;
 
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
+    private static final Pattern INVOICE_NUMBER_PATTERN = Pattern.compile("^FAC-(\\d{4})-(\\d{4})$");
 
     public InvoiceService(InvoiceRepository invoiceRepository,
                           MissionRepository missionRepository,
@@ -65,7 +69,7 @@ public class InvoiceService implements GetAllInvoicesUseCase,
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Invoice execute(String username, Invoice invoiceToCreate) {
         UserEntity user = resolveUser(username);
         MissionEntity mission = resolveMission(user.getId(), invoiceToCreate);
@@ -171,7 +175,21 @@ public class InvoiceService implements GetAllInvoicesUseCase,
     }
 
     private String generateInvoiceNumber(int year) {
-        long nextSequence = invoiceRepository.countByIssueYear(year) + 1;
+        long nextSequence = invoiceRepository.findHighestInvoiceNumberForYear(year)
+                .map(number -> extractInvoiceSequence(number, year) + 1)
+                .orElse(1L);
         return "FAC-%d-%04d".formatted(year, nextSequence);
+    }
+
+    private long extractInvoiceSequence(String invoiceNumber, int expectedYear) {
+        Matcher matcher = INVOICE_NUMBER_PATTERN.matcher(invoiceNumber);
+        if (!matcher.matches()) {
+            throw new IllegalStateException("Invalid invoice number format: " + invoiceNumber);
+        }
+        int year = Integer.parseInt(matcher.group(1));
+        if (year != expectedYear) {
+            throw new IllegalStateException("Invoice number year does not match issue year: " + invoiceNumber);
+        }
+        return Long.parseLong(matcher.group(2));
     }
 }

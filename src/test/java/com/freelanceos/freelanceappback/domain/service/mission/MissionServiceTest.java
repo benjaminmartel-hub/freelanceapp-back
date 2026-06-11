@@ -86,8 +86,8 @@ class MissionServiceTest {
         when(missionRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(entity));
         when(missionMapper.toDomain(entity)).thenReturn(mission);
         when(invoiceRepository.findInvoiceSummariesForMission(1L, 1L)).thenReturn(List.of(
-                buildProjection(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
-                buildProjection(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
+                buildProjection(10L, "FAC-2026-0001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
+                buildProjection(11L, "FAC-2026-0002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
         ));
         when(missionMapper.toInvoiceSummaryForMission(any(InvoiceSummaryForMissionProjection.class)))
                 .thenAnswer(invocation -> {
@@ -117,8 +117,8 @@ class MissionServiceTest {
                         mission.billingType(),
                         mission.internalNotes(),
                         List.of(
-                                new InvoiceSummaryForMission(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
-                                new InvoiceSummaryForMission(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
+                                new InvoiceSummaryForMission(10L, "FAC-2026-0001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
+                                new InvoiceSummaryForMission(11L, "FAC-2026-0002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
                         )
                 ));
 

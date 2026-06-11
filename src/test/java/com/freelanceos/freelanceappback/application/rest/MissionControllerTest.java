@@ -107,8 +107,8 @@ class MissionControllerTest {
                 BigDecimal.valueOf(600), 10, BigDecimal.valueOf(6000), BigDecimal.valueOf(1500), "EUR",
                 LocalDate.now().minusDays(2), LocalDate.now().plusDays(8),
                 MissionStatus.ONGOING, BillingType.TJM, "Notes", List.of(
-                        new InvoiceSummaryForMission(10L, "INV-001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
-                        new InvoiceSummaryForMission(11L, "INV-002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
+                        new InvoiceSummaryForMission(10L, "FAC-2026-0001", BigDecimal.valueOf(1000), InvoiceStatus.PAID),
+                        new InvoiceSummaryForMission(11L, "FAC-2026-0002", BigDecimal.valueOf(500), InvoiceStatus.SENT)
                 ));
 
         when(getMissionDetailUseCase.execute("demo", 1L)).thenReturn(Optional.of(detail));
