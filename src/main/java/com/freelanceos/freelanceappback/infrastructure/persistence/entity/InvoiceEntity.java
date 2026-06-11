@@ -94,7 +94,7 @@ public class InvoiceEntity {
                          LocalDate dueDate,
                          BigDecimal totalHt,
                          BigDecimal totalTtc) {
-        this(id, user, mission, number, status, dueDate, dueDate, totalHt, BigDecimal.valueOf(0.2000), totalTtc);
+        this(id, user, mission, number, status, dueDate, dueDate, totalHt, BigDecimal.valueOf(20.0000), totalTtc);
     }
 
     public InvoiceEntity(Long id,

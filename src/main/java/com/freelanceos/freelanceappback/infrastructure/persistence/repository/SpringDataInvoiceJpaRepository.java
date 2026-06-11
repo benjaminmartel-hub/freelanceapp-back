@@ -36,6 +36,13 @@ public interface SpringDataInvoiceJpaRepository extends JpaRepository<InvoiceEnt
     Optional<InvoiceEntity> findByIdAndUserIdWithMissionAndClient(@Param("id") Long id, @Param("userId") Long userId);
 
     @Query("""
+            select count(i)
+            from InvoiceEntity i
+            where year(i.issueDate) = :year
+            """)
+    long countByIssueYear(@Param("year") int year);
+
+    @Query("""
             select sum(i.totalHt)
             from InvoiceEntity i
             where i.user.id = :userId

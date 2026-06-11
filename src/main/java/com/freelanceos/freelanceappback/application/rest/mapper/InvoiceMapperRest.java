@@ -1,8 +1,10 @@
 package com.freelanceos.freelanceappback.application.rest.mapper;
 
+import com.freelanceos.freelanceappback.application.rest.dto.invoice.InvoiceCreateRequest;
 import com.freelanceos.freelanceappback.application.rest.dto.invoice.InvoiceDetailResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.invoice.InvoiceListResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.invoice.InvoiceStatsResponse;
+import com.freelanceos.freelanceappback.application.rest.dto.invoice.InvoiceUpdateRequest;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionClientResponse;
 import com.freelanceos.freelanceappback.application.rest.dto.mission.MissionSummaryForInvoiceResponse;
 import com.freelanceos.freelanceappback.domain.model.invoice.Invoice;
@@ -12,6 +14,36 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InvoiceMapperRest {
+    public Invoice toDomain(InvoiceCreateRequest request) {
+        return new Invoice(
+                null,
+                null,
+                null,
+                request.issueDate(),
+                request.dueDate(),
+                request.totalHt(),
+                request.vatRate(),
+                request.totalTtc(),
+                null,
+                new MissionSummaryForInvoice(request.missionId(), null, null, null, null)
+        );
+    }
+
+    public Invoice toDomain(Long id, InvoiceUpdateRequest request) {
+        return new Invoice(
+                id,
+                null,
+                null,
+                request.issueDate(),
+                request.dueDate(),
+                request.totalHt(),
+                request.vatRate(),
+                request.totalTtc(),
+                null,
+                new MissionSummaryForInvoice(request.missionId(), null, null, null, null)
+        );
+    }
+
     public InvoiceListResponse toList(Invoice invoice) {
         MissionSummaryForInvoice mission = invoice.mission();
         return new InvoiceListResponse(

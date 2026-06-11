@@ -94,10 +94,10 @@ class JpaInvoiceRepositoryAdapterTest {
 
         InvoiceEntity invoice = new InvoiceEntity(null, user, mission, "FAC-2026-001", InvoiceStatus.SENT,
                 LocalDate.now(), LocalDate.now().plusDays(15),
-                BigDecimal.valueOf(1000), BigDecimal.valueOf(0.2000), BigDecimal.valueOf(1200));
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(20), BigDecimal.valueOf(1200));
         InvoiceEntity otherInvoice = new InvoiceEntity(null, other, otherMission, "FAC-2026-002", InvoiceStatus.PAID,
                 LocalDate.now(), LocalDate.now().plusDays(15),
-                BigDecimal.valueOf(2000), BigDecimal.valueOf(0.2000), BigDecimal.valueOf(2400));
+                BigDecimal.valueOf(2000), BigDecimal.valueOf(20), BigDecimal.valueOf(2400));
         entityManager.persist(invoice);
         entityManager.persist(otherInvoice);
         entityManager.flush();

@@ -13,6 +13,10 @@ public interface InvoiceRepository {
 
     Optional<InvoiceEntity> findByIdAndUserId(Long id, Long userId);
 
+    InvoiceEntity save(InvoiceEntity invoice);
+
+    long countByIssueYear(int year);
+
     List<InvoiceSummaryForMissionProjection> findInvoiceSummariesForMission(Long userId, Long missionId);
 
     BigDecimal sumTotalHtByUserIdAndMissionId(Long userId, Long missionId);

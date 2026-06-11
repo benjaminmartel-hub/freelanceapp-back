@@ -7,9 +7,11 @@ import com.freelanceos.freelanceappback.domain.model.mission.MissionSummaryForIn
 import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStats;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
+import com.freelanceos.freelanceappback.domain.ports.in.invoice.CreateInvoiceUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetAllInvoicesUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetInvoiceDetailUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetInvoiceStatsUseCase;
+import com.freelanceos.freelanceappback.domain.ports.in.invoice.UpdateInvoiceUseCase;
 import com.freelanceos.freelanceappback.infrastructure.security.JwtTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,12 @@ class InvoiceControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
+    private CreateInvoiceUseCase createInvoiceUseCase;
+
+    @MockitoBean
+    private UpdateInvoiceUseCase updateInvoiceUseCase;
+
+    @MockitoBean
     private GetAllInvoicesUseCase getAllInvoicesUseCase;
 
     @MockitoBean
@@ -75,7 +83,7 @@ class InvoiceControllerTest {
                 .andExpect(jsonPath("$[0].number").value("FAC-2026-001"))
                 .andExpect(jsonPath("$[0].status").value("SENT"))
                 .andExpect(jsonPath("$[0].totalHt").value(1000))
-                .andExpect(jsonPath("$[0].vatRate").value(0.2))
+                .andExpect(jsonPath("$[0].vatRate").value(20))
                 .andExpect(jsonPath("$[0].missionId").value(10))
                 .andExpect(jsonPath("$[0].missionTitle").value("Audit"))
                 .andExpect(jsonPath("$[0].clientName").value("Maison Beldi"));
@@ -92,6 +100,7 @@ class InvoiceControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.number").value("FAC-2026-001"))
                 .andExpect(jsonPath("$.status").value("PAID"))
+                .andExpect(jsonPath("$.vatRate").value(20))
                 .andExpect(jsonPath("$.mission.id").value(10))
                 .andExpect(jsonPath("$.mission.title").value("Audit"))
                 .andExpect(jsonPath("$.mission.client.id").value(20))
@@ -132,7 +141,7 @@ class InvoiceControllerTest {
                 LocalDate.of(2026, 1, 5),
                 LocalDate.of(2026, 2, 5),
                 BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(0.2000),
+                BigDecimal.valueOf(20),
                 BigDecimal.valueOf(1200),
                 status,
                 new MissionSummaryForInvoice(

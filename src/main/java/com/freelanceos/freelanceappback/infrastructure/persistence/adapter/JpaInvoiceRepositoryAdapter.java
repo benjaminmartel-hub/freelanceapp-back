@@ -30,6 +30,16 @@ public class JpaInvoiceRepositoryAdapter implements InvoiceRepository {
     }
 
     @Override
+    public InvoiceEntity save(InvoiceEntity invoice) {
+        return invoiceJpaRepository.save(invoice);
+    }
+
+    @Override
+    public long countByIssueYear(int year) {
+        return invoiceJpaRepository.countByIssueYear(year);
+    }
+
+    @Override
     public List<InvoiceSummaryForMissionProjection> findInvoiceSummariesForMission(Long userId, Long missionId) {
         return invoiceJpaRepository.findInvoiceSummariesForMission(userId, missionId);
     }
