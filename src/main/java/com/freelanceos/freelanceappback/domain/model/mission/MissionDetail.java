@@ -3,7 +3,7 @@ package com.freelanceos.freelanceappback.domain.model.mission;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
-import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceSummaryForMission;
 
 import java.util.List;
 
@@ -21,5 +21,5 @@ public record MissionDetail(Long id,
                             MissionStatus status,
                             BillingType billingType,
                             String internalNotes,
-                            List<MissionInvoice> invoices) {
+                            List<InvoiceSummaryForMission> invoices) {
 }

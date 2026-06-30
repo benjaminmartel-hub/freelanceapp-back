@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.freelanceos</groupId>
     <artifactId>freelanceapp-back</artifactId>
-    <version>0.4.1</version>
+    <version>0.6.0</version>
     <name>freelanceapp-back</name>
     <description>freelanceapp-back</description>
     <url/>
@@ -98,6 +98,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>2.0.3</version>
         </dependency>
 
         <dependency>

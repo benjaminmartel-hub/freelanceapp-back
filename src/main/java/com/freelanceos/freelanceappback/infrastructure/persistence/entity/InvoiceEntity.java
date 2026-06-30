@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.entity;
 
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -26,7 +27,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "invoices")
+@Table(name = "invoices",
+        uniqueConstraints = @UniqueConstraint(columnNames = "invoice_number"))
 @EntityListeners(AuditingEntityListener.class)
 public class InvoiceEntity {
     @Id
@@ -51,6 +53,10 @@ public class InvoiceEntity {
     private InvoiceStatus status;
 
     @NotNull
+    @Column(name = "issue_date", nullable = false)
+    private LocalDate issueDate;
+
+    @NotNull
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
@@ -58,6 +64,11 @@ public class InvoiceEntity {
     @Positive
     @Column(name = "total_ht", nullable = false, precision = 19, scale = 2)
     private BigDecimal totalHt;
+
+    @NotNull
+    @Positive
+    @Column(name = "vat_rate", nullable = false, precision = 7, scale = 4)
+    private BigDecimal vatRate;
 
     @NotNull
     @Positive
@@ -83,13 +94,28 @@ public class InvoiceEntity {
                          LocalDate dueDate,
                          BigDecimal totalHt,
                          BigDecimal totalTtc) {
+        this(id, user, mission, number, status, dueDate, dueDate, totalHt, BigDecimal.valueOf(20.0000), totalTtc);
+    }
+
+    public InvoiceEntity(Long id,
+                         UserEntity user,
+                         MissionEntity mission,
+                         String number,
+                         InvoiceStatus status,
+                         LocalDate issueDate,
+                         LocalDate dueDate,
+                         BigDecimal totalHt,
+                         BigDecimal vatRate,
+                         BigDecimal totalTtc) {
         this.id = id;
         this.user = user;
         this.mission = mission;
         this.number = number;
         this.status = status;
+        this.issueDate = issueDate;
         this.dueDate = dueDate;
         this.totalHt = totalHt;
+        this.vatRate = vatRate;
         this.totalTtc = totalTtc;
     }
 
@@ -133,6 +159,14 @@ public class InvoiceEntity {
         this.status = status;
     }
 
+    public LocalDate getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(LocalDate issueDate) {
+        this.issueDate = issueDate;
+    }
+
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -147,6 +181,14 @@ public class InvoiceEntity {
 
     public void setTotalHt(BigDecimal totalHt) {
         this.totalHt = totalHt;
+    }
+
+    public BigDecimal getVatRate() {
+        return vatRate;
+    }
+
+    public void setVatRate(BigDecimal vatRate) {
+        this.vatRate = vatRate;
     }
 
     public BigDecimal getTotalTtc() {

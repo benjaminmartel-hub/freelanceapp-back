@@ -4,7 +4,7 @@ import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
 import com.freelanceos.freelanceappback.domain.exception.ConflictException;
 import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
-import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceSummaryForMission;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
@@ -67,9 +67,9 @@ public class MissionService implements CreateMissionUseCase,
         return missionRepository.findByIdAndUserId(id, userId)
                 .map(missionMapper::toDomain)
                 .map(mission -> {
-                    List<MissionInvoice> invoices = invoiceRepository
-                            .findSummariesByUserIdAndMissionId(userId, mission.id()).stream()
-                            .map(missionMapper::toDomain)
+                    List<InvoiceSummaryForMission> invoices = invoiceRepository
+                            .findInvoiceSummariesForMission(userId, mission.id()).stream()
+                            .map(missionMapper::toInvoiceSummaryForMission)
                             .toList();
                     BigDecimal totalInvoiced = invoiceRepository
                             .sumTotalHtByUserIdAndMissionId(userId, mission.id());

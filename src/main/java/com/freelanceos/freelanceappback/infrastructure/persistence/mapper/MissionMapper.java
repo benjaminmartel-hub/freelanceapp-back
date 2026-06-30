@@ -1,13 +1,13 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.mapper;
 
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
-import com.freelanceos.freelanceappback.domain.model.invoice.MissionInvoice;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceSummaryForMission;
 import com.freelanceos.freelanceappback.domain.model.mission.Mission;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionDetail;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.ClientEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.MissionEntity;
 import com.freelanceos.freelanceappback.infrastructure.persistence.entity.UserEntity;
-import com.freelanceos.freelanceappback.infrastructure.persistence.projection.MissionInvoiceSummaryProjection;
+import com.freelanceos.freelanceappback.infrastructure.persistence.projection.InvoiceSummaryForMissionProjection;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -54,7 +54,7 @@ public class MissionMapper {
         );
     }
 
-    public MissionDetail toDomain(Mission mission, List<MissionInvoice> invoices, BigDecimal totalInvoiced) {
+    public MissionDetail toDomain(Mission mission, List<InvoiceSummaryForMission> invoices, BigDecimal totalInvoiced) {
         return new MissionDetail(
                 mission.id(),
                 mission.userId(),
@@ -74,8 +74,8 @@ public class MissionMapper {
         );
     }
 
-    public MissionInvoice toDomain(MissionInvoiceSummaryProjection projection) {
-        return new MissionInvoice(
+    public InvoiceSummaryForMission toInvoiceSummaryForMission(InvoiceSummaryForMissionProjection projection) {
+        return new InvoiceSummaryForMission(
                 projection.getId(),
                 projection.getNumber(),
                 projection.getAmount(),
