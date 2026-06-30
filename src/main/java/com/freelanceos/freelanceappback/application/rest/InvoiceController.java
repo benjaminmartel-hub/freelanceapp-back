@@ -9,14 +9,19 @@ import com.freelanceos.freelanceappback.application.rest.mapper.InvoiceMapperRes
 import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
 import com.freelanceos.freelanceappback.domain.exception.ConflictException;
 import com.freelanceos.freelanceappback.domain.exception.NotFoundException;
+import com.freelanceos.freelanceappback.domain.model.invoice.GeneratedInvoicePdf;
 import com.freelanceos.freelanceappback.domain.model.invoice.Invoice;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.CreateInvoiceUseCase;
+import com.freelanceos.freelanceappback.domain.ports.in.invoice.GenerateInvoicePdfUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetAllInvoicesUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetInvoiceDetailUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetInvoiceStatsUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.UpdateInvoiceUseCase;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,13 +37,14 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/invoices")
+@RequestMapping({"/invoices"})
 public class InvoiceController {
     private final CreateInvoiceUseCase createInvoiceUseCase;
     private final UpdateInvoiceUseCase updateInvoiceUseCase;
     private final GetAllInvoicesUseCase getAllInvoicesUseCase;
     private final GetInvoiceDetailUseCase getInvoiceDetailUseCase;
     private final GetInvoiceStatsUseCase getInvoiceStatsUseCase;
+    private final GenerateInvoicePdfUseCase generateInvoicePdfUseCase;
     private final InvoiceMapperRest invoiceMapperRest;
     private final AuthenticatedUserResolver authenticatedUserResolver;
 
@@ -47,6 +53,7 @@ public class InvoiceController {
                              GetAllInvoicesUseCase getAllInvoicesUseCase,
                              GetInvoiceDetailUseCase getInvoiceDetailUseCase,
                              GetInvoiceStatsUseCase getInvoiceStatsUseCase,
+                             GenerateInvoicePdfUseCase generateInvoicePdfUseCase,
                              InvoiceMapperRest invoiceMapperRest,
                              AuthenticatedUserResolver authenticatedUserResolver) {
         this.createInvoiceUseCase = createInvoiceUseCase;
@@ -54,6 +61,7 @@ public class InvoiceController {
         this.getAllInvoicesUseCase = getAllInvoicesUseCase;
         this.getInvoiceDetailUseCase = getInvoiceDetailUseCase;
         this.getInvoiceStatsUseCase = getInvoiceStatsUseCase;
+        this.generateInvoicePdfUseCase = generateInvoicePdfUseCase;
         this.invoiceMapperRest = invoiceMapperRest;
         this.authenticatedUserResolver = authenticatedUserResolver;
     }
@@ -81,6 +89,24 @@ public class InvoiceController {
             return getInvoiceDetailUseCase.execute(username, id)
                     .map(invoiceMapperRest::toDetail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invoice not found"));
+        } catch (NotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (BadRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/download")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<byte[]> downloadInvoice(@PathVariable Long id, Principal principal) {
+        String username = authenticatedUserResolver.resolve(principal);
+        try {
+            GeneratedInvoicePdf pdf = generateInvoicePdfUseCase.execute(username, id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invoice not found"));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdf.filename() + "\"")
+                    .body(pdf.content());
         } catch (NotFoundException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         } catch (BadRequestException ex) {

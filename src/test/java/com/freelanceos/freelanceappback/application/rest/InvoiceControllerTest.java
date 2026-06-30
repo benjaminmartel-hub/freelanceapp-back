@@ -2,12 +2,14 @@ package com.freelanceos.freelanceappback.application.rest;
 
 import com.freelanceos.freelanceappback.application.rest.mapper.InvoiceMapperRest;
 import com.freelanceos.freelanceappback.domain.model.client.ClientSummary;
+import com.freelanceos.freelanceappback.domain.model.invoice.GeneratedInvoicePdf;
 import com.freelanceos.freelanceappback.domain.model.invoice.Invoice;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionSummaryForInvoice;
 import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStats;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.CreateInvoiceUseCase;
+import com.freelanceos.freelanceappback.domain.ports.in.invoice.GenerateInvoicePdfUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetAllInvoicesUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetInvoiceDetailUseCase;
 import com.freelanceos.freelanceappback.domain.ports.in.invoice.GetInvoiceStatsUseCase;
@@ -30,6 +32,8 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -67,6 +71,9 @@ class InvoiceControllerTest {
 
     @MockitoBean
     private GetInvoiceStatsUseCase getInvoiceStatsUseCase;
+
+    @MockitoBean
+    private GenerateInvoicePdfUseCase generateInvoicePdfUseCase;
 
     @MockitoBean
     private JwtTokenService jwtTokenService;
@@ -113,6 +120,29 @@ class InvoiceControllerTest {
         when(getInvoiceDetailUseCase.execute("demo", 99L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/invoices/99"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "demo")
+    void downloadInvoiceShouldReturnPdfAttachment() throws Exception {
+        byte[] pdfContent = "%PDF-test".getBytes();
+        when(generateInvoicePdfUseCase.execute("demo", 1L))
+                .thenReturn(Optional.of(new GeneratedInvoicePdf("FAC-2026-0001.pdf", pdfContent)));
+
+        mockMvc.perform(get("/invoices/1/download"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"FAC-2026-0001.pdf\""))
+                .andExpect(content().bytes(pdfContent));
+    }
+
+    @Test
+    @WithMockUser(username = "demo")
+    void downloadInvoiceShouldReturnNotFoundWhenUseCaseReturnsEmpty() throws Exception {
+        when(generateInvoicePdfUseCase.execute("demo", 99L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/invoices/99/download"))
                 .andExpect(status().isNotFound());
     }
 
