@@ -2,7 +2,7 @@ package com.freelanceos.freelanceappback.domain.service.dashboard;
 
 import com.freelanceos.freelanceappback.domain.model.dashboard.ClientRevenueShare;
 import com.freelanceos.freelanceappback.domain.model.dashboard.Dashboard;
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MonthlyStat;
 import com.freelanceos.freelanceappback.domain.ports.out.DashboardMetricsRepository;
 import com.freelanceos.freelanceappback.domain.ports.out.UserRepository;

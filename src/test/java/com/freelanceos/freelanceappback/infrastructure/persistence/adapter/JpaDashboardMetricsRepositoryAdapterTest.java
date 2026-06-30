@@ -1,6 +1,6 @@
 package com.freelanceos.freelanceappback.infrastructure.persistence.adapter;
 
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.mission.BillingType;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.ports.out.DashboardMetricsRepository;
@@ -59,15 +59,15 @@ class JpaDashboardMetricsRepositoryAdapterTest {
         MissionEntity clientCMission = buildMission(user, "Client C");
         MissionEntity otherMission = buildMission(other, "Client A");
 
-        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientAMission, "INV-2026-001", InvoiceStatus.PAID,
+        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientAMission, "FAC-2026-0001", InvoiceStatus.PAID,
                 LocalDate.of(2026, 2, 10), BigDecimal.valueOf(200), BigDecimal.valueOf(240)));
-        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientAMission, "INV-2026-002", InvoiceStatus.SENT,
+        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientAMission, "FAC-2026-0002", InvoiceStatus.SENT,
                 LocalDate.of(2026, 3, 10), BigDecimal.valueOf(150), BigDecimal.valueOf(180)));
-        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientBMission, "INV-2026-003", InvoiceStatus.PAID,
+        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientBMission, "FAC-2026-0003", InvoiceStatus.PAID,
                 LocalDate.of(2026, 4, 10), BigDecimal.valueOf(100), BigDecimal.valueOf(120)));
-        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientCMission, "INV-2026-004", InvoiceStatus.DRAFT,
+        invoiceJpaRepository.save(new InvoiceEntity(null, user, clientCMission, "FAC-2026-0004", InvoiceStatus.DRAFT,
                 LocalDate.of(2026, 5, 10), BigDecimal.valueOf(999), BigDecimal.valueOf(999)));
-        invoiceJpaRepository.save(new InvoiceEntity(null, other, otherMission, "INV-2026-005", InvoiceStatus.PAID,
+        invoiceJpaRepository.save(new InvoiceEntity(null, other, otherMission, "FAC-2026-0005", InvoiceStatus.PAID,
                 LocalDate.of(2026, 6, 10), BigDecimal.valueOf(1000), BigDecimal.valueOf(1200)));
 
         List<ClientRevenueAggregateProjection> result = dashboardMetricsRepository.findClientRevenueDistribution(

@@ -4,7 +4,7 @@ import com.freelanceos.freelanceappback.domain.exception.BadRequestException;
 import com.freelanceos.freelanceappback.domain.model.dashboard.Dashboard;
 import com.freelanceos.freelanceappback.domain.model.dashboard.DeclarationPeriod;
 import com.freelanceos.freelanceappback.domain.model.dashboard.FiscalConfigSettings;
-import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceStatus;
+import com.freelanceos.freelanceappback.domain.model.invoice.InvoiceStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.InvoiceSummary;
 import com.freelanceos.freelanceappback.domain.model.mission.MissionStatus;
 import com.freelanceos.freelanceappback.domain.model.dashboard.MissionSummary;
